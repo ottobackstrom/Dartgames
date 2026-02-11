@@ -2,1539 +2,1782 @@
 <html lang="sv">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dart PRO – Scoreboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Dartgames – Simple & Complete</title>
   <style>
-    :root { --pad: 14px; --radius: 14px; }
-    body { font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif; margin: 0; background:#0b0f14; color:#e9eef5; }
-    header { padding: 18px var(--pad); border-bottom: 1px solid #1c2533; background: #0b0f14; position: sticky; top:0; z-index: 5; }
-    h1 { font-size: 18px; margin: 0 0 6px; }
-    .sub { opacity:.8; font-size: 12px; margin:0; }
-    main { padding: var(--pad); max-width: 1120px; margin: 0 auto; }
-    .grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
-    @media(min-width: 980px){ .grid { grid-template-columns: 380px 1fr; } }
-    .card { background:#101826; border:1px solid #1c2533; border-radius: var(--radius); padding: 14px; }
-    .row { display:flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    label { font-size: 12px; opacity: .85; }
-    input, select, button, textarea { font: inherit; }
-    input, select, textarea {
-      background:#0b1220; border:1px solid #243147; color:#e9eef5;
-      border-radius: 12px; padding: 10px 12px; outline: none;
+    :root{
+      --bg:#0b0f14; --card:#101826; --line:#1c2533;
+      --muted:rgba(233,238,245,.75); --text:#e9eef5;
+      --accent:#2563eb; --danger:#b91c1c;
+      --radius:16px; --pad:14px;
     }
-    input:focus, select:focus, textarea:focus { border-color:#3b82f6; }
-    button {
-      background:#1f2a3d; border:1px solid #2b3a55; color:#e9eef5;
-      border-radius: 12px; padding: 10px 12px; cursor:pointer;
+    *{ box-sizing:border-box; }
+    html,body{ max-width:100%; overflow-x:hidden; }
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial,sans-serif;
     }
-    button.primary { background:#2563eb; border-color:#2563eb; }
-    button.danger { background:#b91c1c; border-color:#b91c1c; }
-    button.ghost { background: transparent; border-color:#2b3a55; }
-    button.small { padding: 7px 10px; border-radius: 10px; font-size: 12px; }
-    .muted { opacity:.8; font-size: 12px; }
-    .players { display:grid; gap: 8px; margin-top: 10px; }
-    .pill { display:flex; justify-content: space-between; align-items:center; gap:10px; padding:10px 12px; border-radius: 12px; background:#0b1220; border:1px solid #243147; }
-    .pill strong { font-size: 14px; }
-    .table { width:100%; border-collapse: collapse; }
-    .table th, .table td { padding: 10px 8px; border-bottom: 1px solid #1c2533; text-align: left; vertical-align: top; }
-    .table th { font-size: 12px; opacity: .85; font-weight: 600; }
-    .tag { font-size: 12px; padding: 3px 8px; border-radius: 999px; border:1px solid #2b3a55; background:#0b1220; opacity:.95; }
-    .hr { height:1px; background:#1c2533; margin: 12px 0; }
-    .kpi { display:flex; gap:10px; flex-wrap: wrap; }
-    .kpi .box { flex:1; min-width: 150px; background:#0b1220; border:1px solid #243147; border-radius: 12px; padding: 10px 12px; }
-    .kpi .box .big { font-size: 18px; font-weight: 700; }
-    .notice { background:#0b1220; border:1px dashed #2b3a55; border-radius: 12px; padding: 10px 12px; font-size: 12px; opacity: .95; }
-    .tabs { display:flex; gap:8px; flex-wrap: wrap; }
-    .tabs button { border-radius: 999px; }
-    .activeTab { background:#2563eb !important; border-color:#2563eb !important; }
-    .right { margin-left:auto; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-    .mini { font-size: 11px; opacity:.85; }
-    .twoCol { display:grid; gap: 10px; grid-template-columns: 1fr; }
-    @media(min-width: 760px){ .twoCol { grid-template-columns: 1fr 1fr; } }
+    a{ color:inherit; }
+    header{
+      position:sticky; top:0; z-index:20;
+      padding: calc(var(--pad) + env(safe-area-inset-top)) var(--pad) var(--pad);
+      background:linear-gradient(to bottom, rgba(11,15,20,.95), rgba(11,15,20,.75));
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    h1{ margin:0 0 6px; font-size:18px; }
+    .sub{ margin:0; font-size:12px; color:var(--muted); }
+
+    main{ padding: var(--pad); max-width: 980px; margin:0 auto; }
+
+    /* Layout */
+    .layout{
+      display:grid; gap:12px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 980px){
+      .layout{ grid-template-columns: 360px 1fr; align-items:start; }
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.20);
+    }
+    .titleRow{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .titleRow > *{ min-width:0; }
+    .titleRow h2{ margin:0; font-size:15px; }
+    .tag{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 10px; border-radius:999px;
+      border:1px solid #2b3a55; background:#0b1220;
+      font-size:12px; color:rgba(233,238,245,.9);
+      white-space:nowrap;
+    }
+    .muted{ color:var(--muted); font-size:12px; }
+    .hr{ height:1px; background:var(--line); margin:12px 0; }
+
+    /* Inputs */
+    label{ font-size:12px; color:var(--muted); }
+    input, select, textarea{
+      width:100%;
+      background:#0b1220; border:1px solid #243147; color:var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      outline:none;
+    }
+    input:focus, select:focus, textarea:focus{ border-color: rgba(37,99,235,.9); }
+    textarea{ min-height:110px; resize:vertical; }
+
+    /* Buttons */
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:stretch;
+    }
+    .row > *{ min-width:0; } /* CRITICAL for iOS flex shrink */
+    button{
+      border-radius: 12px;
+      padding: 10px 12px;
+      border:1px solid #2b3a55;
+      background:#1f2a3d;
+      color:var(--text);
+      cursor:pointer;
+      max-width:100%;
+      flex: 0 0 auto;
+    }
+    button.primary{ background:var(--accent); border-color:var(--accent); }
+    button.danger{ background:var(--danger); border-color:var(--danger); }
+    button.ghost{ background:transparent; }
+    button:disabled{ opacity:.5; cursor:not-allowed; }
+
+    /* Player list */
+    .players{ display:grid; gap:8px; }
+    .playerItem{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      padding:10px 12px;
+      border-radius: 14px;
+      background:#0b1220;
+      border:1px solid #243147;
+      flex-wrap:wrap;
+    }
+    .playerItem > *{ min-width:0; }
+    .playerName{ font-weight:700; }
+    .playerMeta{ font-size:11px; color:var(--muted); }
+
+    /* Tabs (simple) */
+    .tabs{ display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px; }
+    .tabs button{
+      border-radius:999px; padding:8px 12px; font-size:12px;
+      white-space:nowrap;
+    }
+    .tabs button.active{ background:var(--accent); border-color:var(--accent); }
+
+    /* Tables -> horizontal scroll safe */
+    .tableWrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    table{ width:100%; border-collapse:collapse; min-width: 540px; }
+    th,td{ text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+    th{ font-size:12px; color:var(--muted); font-weight:600; }
+    td b{ font-weight:800; }
+
+    /* Compact action area */
+    .actionGrid{
+      display:grid; gap:10px;
+      grid-template-columns: 1fr;
+    }
+    @media(min-width:640px){
+      .actionGrid{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .notice{
+      background:#0b1220;
+      border:1px dashed #2b3a55;
+      border-radius: 14px;
+      padding:10px 12px;
+      font-size:12px;
+      color:rgba(233,238,245,.88);
+    }
+
+    /* iPhone bottom safe area padding for main actions if needed */
+    .safeBottom{ padding-bottom: calc(var(--pad) + env(safe-area-inset-bottom)); }
+
+    /* small helpers */
+    .spacer{ flex: 1 1 auto; }
+    .mono{ font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; }
   </style>
 </head>
 <body>
 <header>
-  <h1>Dart PRO – Scoreboard & spel</h1>
-  <p class="sub">1 fil • sparas lokalt • turordning • historik • export/import</p>
+  <h1>Dartgames</h1>
+  <p class="sub">Enkel & komplett dart-app • alla spel • turordning • undo • export/import • sparas lokalt</p>
 </header>
 
-<main class="grid">
-  <!-- LEFT -->
-  <section class="card">
-    <h2 style="margin:0 0 8px; font-size:16px;">Setup</h2>
-
-    <div class="row">
-      <div style="flex:1; min-width: 190px;">
-        <label>Spel</label><br/>
-        <select id="gameSelect" style="width:100%; margin-top:6px;">
-          <option value="x01">X01 (301/501)</option>
-          <option value="cricket">Cricket</option>
-          <option value="around">Around the Clock</option>
-          <option value="killer">Killer</option>
-          <option value="shanghai">Shanghai</option>
-          <option value="halveit">Halve-It</option>
-          <option value="defend">Defend</option>
-        </select>
-      </div>
+<main class="layout safeBottom">
+  <!-- LEFT: Setup -->
+  <section class="card" id="setupCard">
+    <div class="titleRow">
+      <h2>Setup</h2>
+      <span class="tag" id="siteTag">Offline • LocalStorage</span>
     </div>
 
-    <div id="gameOptions" style="margin-top:10px;"></div>
+    <div class="hr"></div>
+
+    <label>Spel</label>
+    <select id="gameSelect" style="margin-top:6px;">
+      <option value="x01">X01 (301/501)</option>
+      <option value="cricket">Cricket</option>
+      <option value="around">Around the Clock</option>
+      <option value="killer">Killer</option>
+      <option value="shanghai">Shanghai</option>
+      <option value="halveit">Halve-It</option>
+      <option value="defend">Defend</option>
+    </select>
+
+    <div id="optionsArea" style="margin-top:12px;"></div>
+
+    <div class="hr"></div>
+
+    <label>Lägg till spelare</label>
+    <div class="row" style="margin-top:6px;">
+      <input id="playerName" placeholder="Namn" />
+      <button class="primary" id="addPlayerBtn" style="flex:1 1 120px;">+ Lägg till</button>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="titleRow">
+      <h2>Turordning</h2>
+      <span class="muted">Dra ej – använd ↑ ↓</span>
+      <span class="spacer"></span>
+      <button class="ghost" id="shuffleBtn">Slumpa</button>
+    </div>
+
+    <div style="margin-top:10px;" class="players" id="playersList"></div>
 
     <div class="hr"></div>
 
     <div class="row">
-      <div style="flex:1; min-width: 180px;">
-        <label>Lägg till spelare</label><br/>
-        <input id="playerName" placeholder="Namn" style="width:100%; margin-top:6px;" />
+      <button class="primary" id="startBtn" style="flex:1 1 200px;">Starta / Nollställ match</button>
+      <button class="ghost" id="exportBtn" style="flex:1 1 120px;">Export</button>
+      <button class="ghost" id="importBtn" style="flex:1 1 120px;">Import</button>
+      <button class="danger" id="resetAllBtn" style="flex:1 1 120px;">Rensa</button>
+    </div>
+
+    <div id="importBox" style="display:none; margin-top:12px;">
+      <div class="notice">
+        Klistra in JSON här och tryck Importera.
       </div>
-      <button class="primary" id="addPlayerBtn">+ Lägg till</button>
-    </div>
-
-    <div class="players" id="playersList"></div>
-
-    <div class="hr"></div>
-
-    <div class="row">
-      <button class="primary" id="newMatchBtn">Starta / Nollställ match</button>
-      <button class="ghost" id="randomizeOrderBtn">Slumpa turordning</button>
-    </div>
-
-    <div class="row" style="margin-top:8px;">
-      <button class="ghost" id="exportBtn">Export (JSON)</button>
-      <button class="ghost" id="importBtn">Import (JSON)</button>
-      <button class="danger right" id="resetAllBtn">Rensa ALLT</button>
-    </div>
-
-    <div id="importArea" style="display:none; margin-top:10px;">
-      <label>Klistra in JSON</label><br/>
-      <textarea id="importText" rows="7" style="width:100%; margin-top:6px;" class="mono"></textarea>
-      <div class="row" style="margin-top:8px;">
-        <button class="primary" id="doImportBtn">Importera</button>
-        <button class="ghost" id="cancelImportBtn">Avbryt</button>
+      <textarea id="importText" class="mono" style="margin-top:10px;"></textarea>
+      <div class="row" style="margin-top:10px;">
+        <button class="primary" id="doImportBtn" style="flex:1 1 160px;">Importera</button>
+        <button class="ghost" id="cancelImportBtn" style="flex:1 1 160px;">Avbryt</button>
       </div>
     </div>
-
-    <p class="muted" style="margin-top:10px;">
-      Tips i iPhone: Dela → <b>Lägg till på hemskärmen</b>.
-    </p>
   </section>
 
-  <!-- RIGHT -->
-  <section class="card">
-    <div class="row" style="justify-content: space-between;">
-      <h2 id="matchTitle" style="margin:0; font-size:16px;">Match</h2>
-      <span class="tag" id="matchStateTag">Ingen match startad</span>
+  <!-- RIGHT: Match -->
+  <section class="card" id="matchCard">
+    <div class="titleRow">
+      <h2 id="matchTitle">Match</h2>
+      <span class="tag" id="matchTag">Ingen match</span>
+      <span class="spacer"></span>
+      <button class="ghost" id="undoBtn" disabled>Ångra</button>
     </div>
 
     <div class="hr"></div>
 
     <div class="tabs">
-      <button class="small activeTab" data-tab="play">Spela</button>
-      <button class="small" data-tab="stats">Stats</button>
-      <button class="small" data-tab="history">Historik</button>
+      <button class="active" data-tab="play">Spela</button>
+      <button data-tab="score">Scoreboard</button>
+      <button data-tab="stats">Stats</button>
+      <button data-tab="history">Historik</button>
     </div>
 
     <div class="hr"></div>
 
     <div id="tab_play"></div>
+    <div id="tab_score" style="display:none;"></div>
     <div id="tab_stats" style="display:none;"></div>
     <div id="tab_history" style="display:none;"></div>
   </section>
 </main>
 
 <script>
-  // ---------------- Storage ----------------
-  const STORAGE_KEY = "dart_pro_app_v1";
-  const $ = (id) => document.getElementById(id);
+/* ==========================
+   State + Storage
+========================== */
+const STORAGE_KEY = "dartgames_v3_clean";
+const $ = (id) => document.getElementById(id);
 
-  function loadState(){
-    try { const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : null; }
-    catch(e){ return null; }
-  }
-  function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
+}
+function clampInt(v, min, max){
+  let n = Number(String(v).trim());
+  if(!Number.isFinite(n)) n = min;
+  n = Math.round(n);
+  if(n < min) n = min;
+  if(n > max) n = max;
+  return n;
+}
+function nowTime(){
+  return new Date().toLocaleTimeString("sv-SE", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
+}
 
-  // ---------------- State ----------------
-  let state = loadState() ?? {
-    players: [], // {id, name}
-    order: [],   // array of playerId (turn order)
-    ui: { game: "x01", tab: "play" },
-    options: {
-      x01: { start: 501, doubleOut: false, bust: true },
-      cricket: { cutThroat: false },
-      around: { includeBull: true },
-      killer: { livesToKiller: 3, startLives: 3 },
-      shanghai: { startRound: 1 },
-      halveit: { rounds: ["15","16","D","17","18","T","19","20","BULL"] },
-      defend: { shieldsToAttack: 3 }
-    },
-    match: null // {game, createdAt, currentIndex, perPlayer, log, meta}
+const DEFAULT_OPTIONS = {
+  x01: { start: 501, doubleOut: false, bust: true },
+  cricket: { cutThroat: false },
+  around: { includeBull: true },
+  killer: { startLives: 3, livesToKiller: 3 },
+  shanghai: { round: 1 },
+  halveit: { rounds: ["20","19","18","17","16","15","BULL","14","13","12","11","10","9","8","7","6","5","4","3","2","1"] },
+  defend: { shieldsToAttack: 3, winAttacks: 5 }
+};
+
+let state = loadState() ?? {
+  players: [],         // [{id,name}]
+  order: [],           // [id]
+  ui: { game:"x01", tab:"play" },
+  options: JSON.parse(JSON.stringify(DEFAULT_OPTIONS)),
+  match: null          // created on start
+};
+
+function ensureOrder(){
+  const ids = state.players.map(p=>p.id);
+  state.order = (state.order||[]).filter(id => ids.includes(id));
+  for(const id of ids) if(!state.order.includes(id)) state.order.push(id);
+}
+function getPlayerName(id){
+  return state.players.find(p=>p.id===id)?.name ?? "Okänd";
+}
+
+/* ==========================
+   Match Model
+========================== */
+function createEmptyMatch(game){
+  return {
+    game,
+    createdAt: Date.now(),
+    turnIndex: 0,
+    round: 1,
+    ended: false,
+    winnerId: null,
+    per: {},     // per-player game state
+    stats: {},   // per-player stats
+    log: [],     // events
+    undo: []     // snapshots
   };
-
-  const GAMES = {
-    x01: "X01",
-    cricket: "Cricket",
-    around: "Around the Clock",
-    killer: "Killer",
-    shanghai: "Shanghai",
-    halveit: "Halve-It",
-    defend: "Defend"
+}
+function initPlayerStats(match, pid){
+  if(match.stats[pid]) return match.stats[pid];
+  match.stats[pid] = {
+    darts: 0,
+    points: 0,
+    highestTurn: 0,
+    checkoutAttempts: 0,
+    checkouts: 0,
+    notes: {}
   };
+  return match.stats[pid];
+}
+function addStatsTurn(pid, points, darts){
+  const m = state.match;
+  const st = initPlayerStats(m, pid);
+  st.darts += darts;
+  st.points += points;
+  if(points > st.highestTurn) st.highestTurn = points;
+}
+function avg3(pid){
+  const st = state.match?.stats?.[pid];
+  if(!st || st.darts===0) return 0;
+  return (st.points / st.darts) * 3;
+}
+function currentPlayerId(){
+  const m = state.match;
+  if(!m || state.order.length===0) return null;
+  return state.order[m.turnIndex % state.order.length];
+}
+function nextTurn(){
+  const m = state.match;
+  if(!m) return;
+  m.turnIndex = (m.turnIndex + 1) % state.order.length;
+  if(m.turnIndex === 0) m.round += 1;
+}
+function snapshot(){
+  const m = state.match;
+  if(!m) return;
+  m.undo.push(JSON.parse(JSON.stringify(m)));
+  if(m.undo.length > 60) m.undo.shift();
+}
+function undo(){
+  const m = state.match;
+  if(!m || !m.undo.length) return;
+  state.match = m.undo.pop();
+  saveState();
+  renderAll();
+}
 
-  // ---------------- Helpers ----------------
-  const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+/* ==========================
+   Game logic
+========================== */
 
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, (m) => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[m]));
+/* X01 */
+function startX01(m){
+  const opt = state.options.x01;
+  m.meta = { start: opt.start, doubleOut: opt.doubleOut, bust: opt.bust };
+  for(const pid of state.order){
+    m.per[pid] = { score: opt.start, legs: 0 };
+    initPlayerStats(m, pid);
   }
-  function getPlayerName(id){ return state.players.find(p => p.id === id)?.name ?? "Okänd"; }
+  m.log.push({t:Date.now(), type:"start", msg:`X01 start ${opt.start}${opt.doubleOut?" (DO)":""}`});
+}
+function x01ApplyTurn(points){
+  const m = state.match;
+  const pid = currentPlayerId();
+  if(!pid) return;
 
-  function ensureOrder(){
-    // keep order containing only existing players; append new ones
-    const ids = state.players.map(p => p.id);
-    state.order = (state.order || []).filter(id => ids.includes(id));
-    for(const id of ids) if(!state.order.includes(id)) state.order.push(id);
-  }
+  snapshot();
 
-  function setTag(text){ $("matchStateTag").textContent = text; }
+  const opt = m.meta;
+  const p = m.per[pid];
+  const before = p.score;
+  let after = before - points;
 
-  function currentPlayerId(){
-    if(!state.match) return null;
-    const idx = state.match.currentIndex ?? 0;
-    return state.order[idx % state.order.length] ?? null;
-  }
-
-  function logEvent(evt){
-    state.match.log.push({ ts: Date.now(), ...evt });
-  }
-
-  function initStats(playerId){
-    if(!state.match.stats[playerId]){
-      state.match.stats[playerId] = {
-        darts: 0,
-        points: 0,
-        highestTurn: 0,
-        checkoutsAttempted: 0,
-        checkoutsMade: 0
-      };
-    }
-    return state.match.stats[playerId];
-  }
-
-  function addTurnStats(playerId, points, darts=3){
-    const st = initStats(playerId);
-    st.darts += darts;
-    st.points += points;
-    if(points > st.highestTurn) st.highestTurn = points;
-  }
-
-  function avg3dart(playerId){
-    const st = state.match?.stats?.[playerId];
-    if(!st || st.darts === 0) return 0;
-    return (st.points / st.darts) * 3;
-  }
-
-  // ---------------- Render: Players ----------------
-  function renderPlayers(){
-    ensureOrder();
-    const list = $("playersList");
-    list.innerHTML = "";
-
-    if(state.players.length === 0){
-      list.innerHTML = `<div class="notice">Inga spelare ännu.</div>`;
+  // bust rules
+  if(opt.bust){
+    if(after < 0 || (opt.doubleOut && after === 1)){
+      m.log.push({t:Date.now(), type:"x01", msg:`${getPlayerName(pid)} bust (${points})`});
+      addStatsTurn(pid, 0, 3);
+      nextTurn();
+      saveState(); renderAll();
       return;
     }
+  }
+  if(after < 0) after = 0; // if bust disabled, clamp
 
-    // show order list with move up/down
-    state.order.forEach((id, idx) => {
-      const p = state.players.find(x => x.id === id);
-      if(!p) return;
-      const div = document.createElement("div");
-      div.className = "pill";
-      div.innerHTML = `
+  p.score = after;
+  addStatsTurn(pid, points, 3);
+  m.log.push({t:Date.now(), type:"x01", msg:`${getPlayerName(pid)} -${points} (${before}→${after})`});
+
+  if(after === 0){
+    // finish leg (user decides validity if DO, since no dart-by-dart)
+    const st = initPlayerStats(m, pid);
+    st.checkoutAttempts += 1;
+    st.checkouts += 1;
+
+    p.legs += 1;
+    m.log.push({t:Date.now(), type:"x01", msg:`${getPlayerName(pid)} vinner leg! (reset)`});
+    // reset all scores
+    for(const id of state.order) m.per[id].score = opt.start;
+  }
+
+  nextTurn();
+  saveState(); renderAll();
+}
+
+/* Cricket */
+function startCricket(m){
+  const opt = state.options.cricket;
+  m.meta = { cutThroat: opt.cutThroat, targets:["20","19","18","17","16","15","BULL"] };
+  for(const pid of state.order){
+    m.per[pid] = {
+      marks: Object.fromEntries(m.meta.targets.map(t=>[t,0])),
+      points: 0
+    };
+    initPlayerStats(m, pid);
+  }
+  m.log.push({t:Date.now(), type:"start", msg:`Cricket${opt.cutThroat?" (Cut-throat)":""}`});
+}
+function cricketHit(target, mult){
+  const m = state.match;
+  const pid = currentPlayerId();
+  if(!pid) return;
+
+  snapshot();
+
+  const me = m.per[pid];
+  let pointsScored = 0;
+
+  for(let i=0;i<mult;i++){
+    if(me.marks[target] < 3){
+      me.marks[target] += 1;
+    }else{
+      // scoring dart if someone else not closed
+      const someoneOpen = state.order.some(oid => oid!==pid && m.per[oid].marks[target] < 3);
+      if(someoneOpen){
+        const val = (target==="BULL") ? 25 : Number(target);
+        pointsScored += val;
+      }
+    }
+  }
+
+  if(pointsScored){
+    if(m.meta.cutThroat){
+      // give points to opponents not closed
+      for(const oid of state.order){
+        if(oid===pid) continue;
+        if(m.per[oid].marks[target] < 3) m.per[oid].points += pointsScored;
+      }
+    }else{
+      me.points += pointsScored;
+    }
+  }
+
+  addStatsTurn(pid, pointsScored, 1);
+  m.log.push({t:Date.now(), type:"cricket", msg:`${getPlayerName(pid)} ${target} x${mult}${pointsScored?` (+${pointsScored})`:""}`});
+
+  saveState(); renderAll();
+}
+
+/* Around the Clock */
+function startAround(m){
+  const opt = state.options.around;
+  const seq = Array.from({length:20},(_,i)=>String(i+1));
+  if(opt.includeBull) seq.push("BULL");
+  m.meta = { seq };
+  for(const pid of state.order){
+    m.per[pid] = { idx: 0, done:false, place:null };
+    initPlayerStats(m, pid);
+  }
+  m.log.push({t:Date.now(), type:"start", msg:`Around the Clock (${opt.includeBull?"+bull":"utan bull"})`});
+}
+function aroundResult(success){
+  const m = state.match;
+  const pid = currentPlayerId();
+  if(!pid) return;
+
+  snapshot();
+
+  const p = m.per[pid];
+  if(!p.done && success){
+    p.idx += 1;
+    if(p.idx >= m.meta.seq.length){
+      p.done = true;
+      const placed = state.order.filter(id => m.per[id].place != null).length;
+      p.place = placed + 1;
+      m.log.push({t:Date.now(), type:"around", msg:`${getPlayerName(pid)} klar! (plats ${p.place})`});
+      // if everyone done, end
+      if(state.order.every(id => m.per[id].done)){
+        m.ended = true;
+        m.winnerId = state.order.find(id => m.per[id].place===1) ?? pid;
+        m.log.push({t:Date.now(), type:"end", msg:`Vinnare: ${getPlayerName(m.winnerId)}`});
+      }
+    }else{
+      m.log.push({t:Date.now(), type:"around", msg:`${getPlayerName(pid)} träffade → nästa ${m.meta.seq[p.idx]}`});
+    }
+  }else{
+    m.log.push({t:Date.now(), type:"around", msg:`${getPlayerName(pid)} miss`});
+  }
+  addStatsTurn(pid, 0, 3);
+  nextTurn();
+  saveState(); renderAll();
+}
+
+/* Killer */
+function startKiller(m){
+  const opt = state.options.killer;
+  const pool = Array.from({length:20},(_,i)=>i+1);
+  // shuffle
+  for(let i=pool.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+  }
+  m.meta = { startLives: opt.startLives, livesToKiller: opt.livesToKiller };
+  for(let i=0;i<state.order.length;i++){
+    const pid = state.order[i];
+    const lives = opt.startLives;
+    m.per[pid] = { num: pool[i%pool.length], lives, killer: lives>=opt.livesToKiller, out:false };
+    initPlayerStats(m, pid);
+  }
+  m.log.push({t:Date.now(), type:"start", msg:`Killer (start ${opt.startLives}, killer vid ${opt.livesToKiller})`});
+}
+function killerGainLife(){
+  const m = state.match;
+  const pid = currentPlayerId();
+  if(!pid) return;
+
+  snapshot();
+
+  const p = m.per[pid];
+  if(p.out){ saveState(); renderAll(); return; }
+  p.lives = Math.min(9, p.lives + 1);
+  if(p.lives >= m.meta.livesToKiller) p.killer = true;
+
+  m.log.push({t:Date.now(), type:"killer", msg:`${getPlayerName(pid)} +1 liv (nu ${p.lives})`});
+  addStatsTurn(pid, 0, 3);
+  nextTurn();
+  saveState(); renderAll();
+}
+function killerAttack(victimId){
+  const m = state.match;
+  const pid = currentPlayerId();
+  if(!pid || !victimId) return;
+
+  snapshot();
+
+  const a = m.per[pid];
+  const v = m.per[victimId];
+  if(a.out){ saveState(); renderAll(); return; }
+  if(!a.killer){
+    m.log.push({t:Date.now(), type:"killer", msg:`${getPlayerName(pid)} kan ej attackera (inte Killer)`});
+    addStatsTurn(pid, 0, 3);
+    nextTurn();
+    saveState(); renderAll();
+    return;
+  }
+  if(v.out){
+    m.log.push({t:Date.now(), type:"killer", msg:`${getPlayerName(victimId)} är redan ute`});
+    addStatsTurn(pid, 0, 3);
+    nextTurn();
+    saveState(); renderAll();
+    return;
+  }
+
+  v.lives = Math.max(0, v.lives - 1);
+  if(v.lives === 0){ v.out = true; }
+
+  m.log.push({t:Date.now(), type:"killer", msg:`${getPlayerName(pid)} attackerar ${getPlayerName(victimId)} (-1 liv → ${v.lives})`});
+  addStatsTurn(pid, 0, 3);
+
+  const alive = state.order.filter(id => !m.per[id].out);
+  if(alive.length === 1){
+    m.ended = true;
+    m.winnerId = alive[0];
+    m.log.push({t:Date.now(), type:"end", msg:`Vinnare: ${getPlayerName(m.winnerId)}`});
+  }
+
+  nextTurn();
+  saveState(); renderAll();
+}
+
+/* Shanghai */
+function startShanghai(m){
+  const opt = state.options.shanghai;
+  m.meta = { round: clampInt(opt.round,1,20) };
+  for(const pid of state.order){
+    m.per[pid] = { points:0, shanghai:0 };
+    initPlayerStats(m, pid);
+  }
+  m.log.push({t:Date.now(), type:"start", msg:`Shanghai (runda ${m.meta.round})`});
+}
+function shanghaiAdd(points, isShanghai=false, advanceRound=false){
+  const m = state.match;
+  const pid = currentPlayerId();
+  if(!pid) return;
+
+  snapshot();
+
+  if(advanceRound){
+    m.meta.round = Math.min(20, m.meta.round + 1);
+    m.log.push({t:Date.now(), type:"shanghai", msg:`Ny runda: ${m.meta.round}`});
+    saveState(); renderAll();
+    return;
+  }
+
+  const p = m.per[pid];
+  p.points += points;
+  if(isShanghai) p.shanghai += 1;
+
+  addStatsTurn(pid, points, 3);
+  m.log.push({t:Date.now(), type:"shanghai", msg:`${getPlayerName(pid)} +${points}${isShanghai?" (Shanghai!)":""}`});
+  nextTurn();
+  saveState(); renderAll();
+}
+
+/* Halve-It */
+function startHalveIt(m){
+  const opt = state.options.halveit;
+  m.meta = { rounds: opt.rounds.slice(), idx: 0 };
+  for(const pid of state.order){
+    m.per[pid] = { points: 0 };
+    initPlayerStats(m, pid);
+  }
+  m.log.push({t:Date.now(), type:"start", msg:`Halve-It (mål: ${m.meta.rounds[0]})`});
+}
+function halveItTurn(points, nextRound=false){
+  const m = state.match;
+  const pid = currentPlayerId();
+  if(!pid) return;
+
+  snapshot();
+
+  if(nextRound){
+    m.meta.idx = Math.min(m.meta.rounds.length-1, m.meta.idx + 1);
+    m.log.push({t:Date.now(), type:"halveit", msg:`Nytt mål: ${m.meta.rounds[m.meta.idx]}`});
+    saveState(); renderAll();
+    return;
+  }
+
+  const p = m.per[pid];
+  if(points === 0){
+    p.points = Math.floor(p.points / 2);
+    m.log.push({t:Date.now(), type:"halveit", msg:`${getPlayerName(pid)} 0 → halverad (${p.points})`});
+  }else{
+    p.points += points;
+    m.log.push({t:Date.now(), type:"halveit", msg:`${getPlayerName(pid)} +${points} (${p.points})`});
+  }
+  addStatsTurn(pid, points, 3);
+  nextTurn();
+  saveState(); renderAll();
+}
+
+/* Defend */
+function startDefend(m){
+  const opt = state.options.defend;
+  const pool = Array.from({length:20},(_,i)=>i+1);
+  for(let i=pool.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [pool[i],pool[j]]=[pool[j],pool[i]];
+  }
+  m.meta = { shieldsToAttack: opt.shieldsToAttack, winAttacks: opt.winAttacks };
+  for(let i=0;i<state.order.length;i++){
+    const pid = state.order[i];
+    m.per[pid] = { target: pool[i%pool.length], shields: 0, attacks: 0 };
+    initPlayerStats(m, pid);
+  }
+  m.log.push({t:Date.now(), type:"start", msg:`Defend (attack vid ${opt.shieldsToAttack} sköldar, vinst ${opt.winAttacks} attacker)`});
+}
+function defendShield(delta){
+  const m = state.match;
+  const pid = currentPlayerId();
+  if(!pid) return;
+
+  snapshot();
+
+  const p = m.per[pid];
+  p.shields = Math.max(0, Math.min(m.meta.shieldsToAttack, p.shields + delta));
+  m.log.push({t:Date.now(), type:"defend", msg:`${getPlayerName(pid)} ${delta>0?"+":"-"} sköld (${p.shields}/${m.meta.shieldsToAttack})`});
+  addStatsTurn(pid, 0, 3);
+  nextTurn();
+  saveState(); renderAll();
+}
+function defendAttack(victimId){
+  const m = state.match;
+  const pid = currentPlayerId();
+  if(!pid || !victimId) return;
+
+  snapshot();
+
+  const a = m.per[pid];
+  const v = m.per[victimId];
+
+  if(a.shields < m.meta.shieldsToAttack){
+    m.log.push({t:Date.now(), type:"defend", msg:`${getPlayerName(pid)} kan ej attackera (behöver ${m.meta.shieldsToAttack} sköldar)`});
+    addStatsTurn(pid, 0, 3);
+    nextTurn();
+    saveState(); renderAll();
+    return;
+  }
+
+  v.shields = Math.max(0, v.shields - 1);
+  a.attacks += 1;
+  a.shields = 0; // spend shields (enkel och tydlig regel)
+
+  m.log.push({t:Date.now(), type:"defend", msg:`${getPlayerName(pid)} attackerar ${getPlayerName(victimId)} (-1 sköld). Attacker: ${a.attacks}`});
+  addStatsTurn(pid, 0, 3);
+
+  if(a.attacks >= m.meta.winAttacks){
+    m.ended = true;
+    m.winnerId = pid;
+    m.log.push({t:Date.now(), type:"end", msg:`Vinnare: ${getPlayerName(pid)} (${a.attacks} attacker)`});
+  }
+
+  nextTurn();
+  saveState(); renderAll();
+}
+
+/* ==========================
+   UI: Options
+========================== */
+function renderOptions(){
+  const g = state.ui.game;
+  const opt = state.options[g];
+  let html = "";
+
+  if(g==="x01"){
+    html = `
+      <div class="notice">
+        X01: skriv turpoäng (0–180). Double-out hanteras som “du avgör” vid finish.
+      </div>
+      <div class="hr"></div>
+      <div class="actionGrid">
         <div>
-          <strong>${escapeHtml(p.name)}</strong>
-          <div class="mini muted">Tur: ${idx+1} • ID: ${id.slice(0,6)}</div>
+          <label>Start</label>
+          <select id="opt_x01_start" style="margin-top:6px;">
+            <option value="501">501</option>
+            <option value="301">301</option>
+          </select>
         </div>
-        <div class="row" style="gap:6px;">
-          <button class="small ghost" data-up="${id}" title="Upp">↑</button>
-          <button class="small ghost" data-down="${id}" title="Ner">↓</button>
-          <button class="small danger" data-del="${id}">Ta bort</button>
+        <div>
+          <label>Regler</label>
+          <div class="row" style="margin-top:6px;">
+            <button class="${opt.bust?'primary':'ghost'}" id="opt_x01_bust">Bust: ${opt.bust?'På':'Av'}</button>
+            <button class="${opt.doubleOut?'primary':'ghost'}" id="opt_x01_do">Double-out: ${opt.doubleOut?'På':'Av'}</button>
+          </div>
         </div>
-      `;
-      list.appendChild(div);
-    });
+      </div>
+    `;
+  }
 
-    list.querySelectorAll("button[data-up]").forEach(btn => btn.addEventListener("click", () => {
+  if(g==="cricket"){
+    html = `
+      <div class="notice">Cricket: 20–15 + bull. Extra marks ger poäng om andra inte stängt.</div>
+      <div class="hr"></div>
+      <div class="row">
+        <button class="${opt.cutThroat?'primary':'ghost'}" id="opt_cr_cut">Cut-throat: ${opt.cutThroat?'På':'Av'}</button>
+      </div>
+    `;
+  }
+
+  if(g==="around"){
+    html = `
+      <div class="notice">Around the Clock: tryck Hit/Miss för att gå vidare på nästa nummer.</div>
+      <div class="hr"></div>
+      <div class="row">
+        <button class="${opt.includeBull?'primary':'ghost'}" id="opt_ar_bull">Bull sist: ${opt.includeBull?'På':'Av'}</button>
+      </div>
+    `;
+  }
+
+  if(g==="killer"){
+    html = `
+      <div class="notice">Killer: +1 liv på eget nummer. När du är Killer kan du attackera andras nummer.</div>
+      <div class="hr"></div>
+      <div class="actionGrid">
+        <div>
+          <label>Start-liv (2–9)</label>
+          <input id="opt_k_start" inputmode="numeric" value="${opt.startLives}" style="margin-top:6px;">
+        </div>
+        <div>
+          <label>Liv för “Killer” (2–9)</label>
+          <input id="opt_k_killer" inputmode="numeric" value="${opt.livesToKiller}" style="margin-top:6px;">
+        </div>
+      </div>
+    `;
+  }
+
+  if(g==="shanghai"){
+    html = `
+      <div class="notice">Shanghai: registrera poängen på rundans nummer. Du kan markera “Shanghai!” också.</div>
+      <div class="hr"></div>
+      <div>
+        <label>Start-runda (1–20)</label>
+        <input id="opt_sh_round" inputmode="numeric" value="${opt.round}" style="margin-top:6px;">
+      </div>
+    `;
+  }
+
+  if(g==="halveit"){
+    html = `
+      <div class="notice">
+        Halve-It mål: ${escapeHtml(opt.rounds.join(", "))}<br>
+        Du matar in rundpoäng (0 = halvering).
+      </div>
+    `;
+  }
+
+  if(g==="defend"){
+    html = `
+      <div class="notice">Defend: samla sköldar, attackera, först till X attacker vinner.</div>
+      <div class="hr"></div>
+      <div class="actionGrid">
+        <div>
+          <label>Sköldar för attack (2–5)</label>
+          <input id="opt_def_sh" inputmode="numeric" value="${opt.shieldsToAttack}" style="margin-top:6px;">
+        </div>
+        <div>
+          <label>Attacker för vinst (3–10)</label>
+          <input id="opt_def_win" inputmode="numeric" value="${opt.winAttacks}" style="margin-top:6px;">
+        </div>
+      </div>
+    `;
+  }
+
+  $("optionsArea").innerHTML = html;
+
+  // wire
+  if(g==="x01"){
+    $("opt_x01_start").value = String(opt.start);
+    $("opt_x01_start").addEventListener("change", e => { opt.start = Number(e.target.value)||501; saveState(); });
+    $("opt_x01_bust").addEventListener("click", ()=>{ opt.bust = !opt.bust; saveState(); renderOptions(); });
+    $("opt_x01_do").addEventListener("click", ()=>{ opt.doubleOut = !opt.doubleOut; saveState(); renderOptions(); });
+  }
+  if(g==="cricket"){
+    $("opt_cr_cut").addEventListener("click", ()=>{ opt.cutThroat = !opt.cutThroat; saveState(); renderOptions(); });
+  }
+  if(g==="around"){
+    $("opt_ar_bull").addEventListener("click", ()=>{ opt.includeBull = !opt.includeBull; saveState(); renderOptions(); });
+  }
+  if(g==="killer"){
+    $("opt_k_start").addEventListener("change", e => {
+      opt.startLives = clampInt(e.target.value,2,9); e.target.value = opt.startLives; saveState();
+    });
+    $("opt_k_killer").addEventListener("change", e => {
+      opt.livesToKiller = clampInt(e.target.value,2,9); e.target.value = opt.livesToKiller; saveState();
+    });
+  }
+  if(g==="shanghai"){
+    $("opt_sh_round").addEventListener("change", e => {
+      opt.round = clampInt(e.target.value,1,20); e.target.value = opt.round; saveState();
+    });
+  }
+  if(g==="defend"){
+    $("opt_def_sh").addEventListener("change", e => {
+      opt.shieldsToAttack = clampInt(e.target.value,2,5); e.target.value = opt.shieldsToAttack; saveState();
+    });
+    $("opt_def_win").addEventListener("change", e => {
+      opt.winAttacks = clampInt(e.target.value,3,10); e.target.value = opt.winAttacks; saveState();
+    });
+  }
+}
+
+/* ==========================
+   UI: Players list
+========================== */
+function renderPlayers(){
+  ensureOrder();
+  const list = $("playersList");
+  list.innerHTML = "";
+
+  if(state.order.length===0){
+    list.innerHTML = `<div class="notice">Inga spelare ännu.</div>`;
+    return;
+  }
+
+  for(let idx=0; idx<state.order.length; idx++){
+    const id = state.order[idx];
+    const name = getPlayerName(id);
+    const row = document.createElement("div");
+    row.className = "playerItem";
+    row.innerHTML = `
+      <div style="flex:1 1 180px;">
+        <div class="playerName">${escapeHtml(name)}</div>
+        <div class="playerMeta">Tur ${idx+1} • ID ${escapeHtml(id.slice(0,6))}</div>
+      </div>
+      <div class="row" style="gap:8px;">
+        <button class="ghost" data-up="${id}">↑</button>
+        <button class="ghost" data-down="${id}">↓</button>
+        <button class="danger" data-del="${id}">Ta bort</button>
+      </div>
+    `;
+    list.appendChild(row);
+  }
+
+  list.querySelectorAll("button[data-up]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
       const id = btn.getAttribute("data-up");
       const i = state.order.indexOf(id);
-      if(i > 0){
-        [state.order[i-1], state.order[i]] = [state.order[i], state.order[i-1]];
-        saveState(); renderAll();
-      }
-    }));
-    list.querySelectorAll("button[data-down]").forEach(btn => btn.addEventListener("click", () => {
+      if(i>0){ [state.order[i-1],state.order[i]]=[state.order[i],state.order[i-1]]; saveState(); renderAll(); }
+    });
+  });
+  list.querySelectorAll("button[data-down]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
       const id = btn.getAttribute("data-down");
       const i = state.order.indexOf(id);
-      if(i >= 0 && i < state.order.length-1){
-        [state.order[i+1], state.order[i]] = [state.order[i], state.order[i+1]];
-        saveState(); renderAll();
-      }
-    }));
-    list.querySelectorAll("button[data-del]").forEach(btn => btn.addEventListener("click", () => {
+      if(i>=0 && i<state.order.length-1){ [state.order[i+1],state.order[i]]=[state.order[i],state.order[i+1]]; saveState(); renderAll(); }
+    });
+  });
+  list.querySelectorAll("button[data-del]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
       const id = btn.getAttribute("data-del");
-      state.players = state.players.filter(p => p.id !== id);
-      state.order = state.order.filter(x => x !== id);
-      // remove from match too
+      state.players = state.players.filter(p=>p.id!==id);
+      state.order = state.order.filter(x=>x!==id);
       if(state.match){
-        delete state.match.perPlayer[id];
+        delete state.match.per[id];
         delete state.match.stats[id];
+        if(state.match.turnIndex >= state.order.length) state.match.turnIndex = 0;
       }
       saveState(); renderAll();
-    }));
+    });
+  });
+}
+
+/* ==========================
+   Tabs
+========================== */
+function setTab(tab){
+  state.ui.tab = tab;
+  saveState();
+  renderTabs();
+}
+function renderTabs(){
+  const tab = state.ui.tab;
+  document.querySelectorAll(".tabs button").forEach(b=>{
+    b.classList.toggle("active", b.getAttribute("data-tab")===tab);
+  });
+  $("tab_play").style.display = tab==="play" ? "block" : "none";
+  $("tab_score").style.display = tab==="score" ? "block" : "none";
+  $("tab_stats").style.display = tab==="stats" ? "block" : "none";
+  $("tab_history").style.display = tab==="history" ? "block" : "none";
+}
+
+/* ==========================
+   Render: Match area
+========================== */
+function renderMatchHeader(){
+  const m = state.match;
+  if(!m){
+    $("matchTitle").textContent = "Match";
+    $("matchTag").textContent = "Ingen match";
+    $("undoBtn").disabled = true;
+    return;
+  }
+  const pid = currentPlayerId();
+  const who = pid ? getPlayerName(pid) : "—";
+  $("matchTitle").textContent = `Match – ${m.game.toUpperCase()}`;
+  if(m.ended){
+    $("matchTag").textContent = `Avslutad • vinnare: ${getPlayerName(m.winnerId)}`;
+  }else{
+    $("matchTag").textContent = `R${m.round} • Tur: ${who}`;
+  }
+  $("undoBtn").disabled = (m.undo.length===0);
+}
+
+function renderPlayTab(){
+  const area = $("tab_play");
+  area.innerHTML = "";
+
+  if(!state.match){
+    area.innerHTML = `<div class="notice">Starta en match till vänster.</div>`;
+    return;
   }
 
-  // ---------------- Render: Game Options ----------------
-  function renderGameOptions(){
-    const g = state.ui.game;
-    const opt = state.options[g] || {};
-    const wrap = $("gameOptions");
-    wrap.innerHTML = "";
+  const m = state.match;
+  const pid = currentPlayerId();
+  const who = pid ? getPlayerName(pid) : "—";
 
-    if(g === "x01"){
-      wrap.innerHTML = `
-        <div class="twoCol">
-          <div>
-            <label>Startpoäng</label><br/>
-            <select id="opt_x01_start" style="width:100%; margin-top:6px;">
-              <option value="501">501</option>
-              <option value="301">301</option>
-            </select>
-          </div>
-          <div>
-            <label>Regler</label><br/>
-            <div class="row" style="margin-top:6px;">
-              <label class="tag"><input type="checkbox" id="opt_x01_bust" /> Bust</label>
-              <label class="tag"><input type="checkbox" id="opt_x01_doubleOut" /> Double out</label>
-            </div>
-          </div>
-        </div>
-      `;
-      $("opt_x01_start").value = String(opt.start ?? 501);
-      $("opt_x01_bust").checked = !!opt.bust;
-      $("opt_x01_doubleOut").checked = !!opt.doubleOut;
+  const top = document.createElement("div");
+  top.innerHTML = `
+    <div class="notice">
+      <b>Nu kastar:</b> ${escapeHtml(who)} •
+      <b>Runda:</b> ${m.round}
+      ${m.ended ? " • <b>Match klar</b>" : ""}
+    </div>
+    <div class="hr"></div>
+    <div class="row">
+      <button class="ghost" id="prevBtn" ${m.ended?"disabled":""}>← Föreg</button>
+      <button class="primary" id="nextBtn" ${m.ended?"disabled":""}>Nästa →</button>
+      <span class="tag">Spel: ${escapeHtml(m.game)}</span>
+    </div>
+  `;
+  area.appendChild(top);
 
-      $("opt_x01_start").addEventListener("change", e => { opt.start = Number(e.target.value)||501; saveState(); });
-      $("opt_x01_bust").addEventListener("change", e => { opt.bust = e.target.checked; saveState(); });
-      $("opt_x01_doubleOut").addEventListener("change", e => { opt.doubleOut = e.target.checked; saveState(); });
-      return;
-    }
-
-    if(g === "cricket"){
-      wrap.innerHTML = `
-        <div class="row">
-          <label class="tag"><input type="checkbox" id="opt_cricket_cut" /> Cut-throat</label>
-        </div>
-      `;
-      $("opt_cricket_cut").checked = !!opt.cutThroat;
-      $("opt_cricket_cut").addEventListener("change", e => { opt.cutThroat = e.target.checked; saveState(); });
-      return;
-    }
-
-    if(g === "around"){
-      wrap.innerHTML = `
-        <div class="row">
-          <label class="tag"><input type="checkbox" id="opt_around_bull" /> Inkludera bull sist</label>
-        </div>
-      `;
-      $("opt_around_bull").checked = !!opt.includeBull;
-      $("opt_around_bull").addEventListener("change", e => { opt.includeBull = e.target.checked; saveState(); });
-      return;
-    }
-
-    if(g === "killer"){
-      wrap.innerHTML = `
-        <div class="twoCol">
-          <div>
-            <label>Start-liv</label><br/>
-            <input id="opt_killer_startLives" inputmode="numeric" value="${opt.startLives ?? 3}" style="width:100%; margin-top:6px;" />
-          </div>
-          <div>
-            <label>Liv för att bli “Killer”</label><br/>
-            <input id="opt_killer_livesToKiller" inputmode="numeric" value="${opt.livesToKiller ?? 3}" style="width:100%; margin-top:6px;" />
-          </div>
-        </div>
-        <div class="notice" style="margin-top:10px;">
-          Enkel killer: alla får ett nummer (1–20). Träff på eget nummer +1 liv (upp till liv-gräns). När du når gränsen är du “Killer”.
-          Killer kan attackera andra: träff på deras nummer -1 liv (0 = ute).
-        </div>
-      `;
-      $("opt_killer_startLives").addEventListener("change", e => { opt.startLives = clampInt(e.target.value,1,9); e.target.value=opt.startLives; saveState(); });
-      $("opt_killer_livesToKiller").addEventListener("change", e => { opt.livesToKiller = clampInt(e.target.value,1,9); e.target.value=opt.livesToKiller; saveState(); });
-      return;
-    }
-
-    if(g === "shanghai"){
-      wrap.innerHTML = `
-        <div class="row">
-          <div style="flex:1; min-width: 220px;">
-            <label>Start-runda</label><br/>
-            <input id="opt_shanghai_round" inputmode="numeric" value="${opt.startRound ?? 1}" style="width:100%; margin-top:6px;" />
-          </div>
-        </div>
-      `;
-      $("opt_shanghai_round").addEventListener("change", e => { opt.startRound = clampInt(e.target.value,1,20); e.target.value=opt.startRound; saveState(); });
-      return;
-    }
-
-    if(g === "halveit"){
-      wrap.innerHTML = `
-        <div class="notice">
-          RUNDOR: ${escapeHtml((opt.rounds||[]).join(", "))}<br/>
-          Här registrerar du rundpoängen (0 om miss), appen halverar automatiskt vid 0.
-          Vill du byta rundor: öppna koden och ändra options.halveit.rounds.
-        </div>
-      `;
-      return;
-    }
-
-    if(g === "defend"){
-      wrap.innerHTML = `
-        <div class="row">
-          <div style="flex:1; min-width: 240px;">
-            <label>Sköldar för attack</label><br/>
-            <input id="opt_def_shields" inputmode="numeric" value="${opt.shieldsToAttack ?? 3}" style="width:100%; margin-top:6px;" />
-          </div>
-        </div>
-      `;
-      $("opt_def_shields").addEventListener("change", e => { opt.shieldsToAttack = clampInt(e.target.value,1,5); e.target.value=opt.shieldsToAttack; saveState(); });
-      return;
-    }
-  }
-
-  function clampInt(v,min,max){
-    let n = Number(String(v).trim());
-    if(!Number.isFinite(n)) n = min;
-    n = Math.round(n);
-    if(n<min) n=min;
-    if(n>max) n=max;
-    return n;
-  }
-
-  // ---------------- Match Init ----------------
-  function startNewMatch(){
-    if(state.players.length === 0){ alert("Lägg till minst en spelare först."); return; }
-    ensureOrder();
-    if(state.order.length === 0){ alert("Turordning saknas."); return; }
-
-    const game = state.ui.game;
-    const createdAt = Date.now();
-
-    const match = {
-      game,
-      createdAt,
-      currentIndex: 0,
-      perPlayer: {},   // game-specific
-      stats: {},       // per player
-      log: [],         // unified log
-      meta: {}         // game meta like round
-    };
-
-    // init perPlayer based on game
-    if(game === "x01"){
-      const opt = state.options.x01;
-      match.meta.start = opt.start ?? 501;
-      match.meta.doubleOut = !!opt.doubleOut;
-      match.meta.bust = (opt.bust !== false);
-      for(const pid of state.order){
-        match.perPlayer[pid] = { score: match.meta.start, legs: 0, sets: 0 };
-        match.stats[pid] = initStatsObject();
-      }
-    }
-
-    if(game === "cricket"){
-      const opt = state.options.cricket;
-      match.meta.cutThroat = !!opt.cutThroat;
-      match.meta.targets = ["20","19","18","17","16","15","BULL"];
-      for(const pid of state.order){
-        match.perPlayer[pid] = {
-          marks: { "20":0,"19":0,"18":0,"17":0,"16":0,"15":0,"BULL":0 },
-          score: 0
-        };
-        match.stats[pid] = initStatsObject();
-      }
-    }
-
-    if(game === "around"){
-      const opt = state.options.around;
-      const seq = Array.from({length:20},(_,i)=>String(i+1));
-      if(opt.includeBull) seq.push("BULL");
-      match.meta.seq = seq;
-      for(const pid of state.order){
-        match.perPlayer[pid] = { index: 0, done: false };
-        match.stats[pid] = initStatsObject();
-      }
-    }
-
-    if(game === "killer"){
-      const opt = state.options.killer;
-      const pool = Array.from({length:20},(_,i)=>i+1);
-      shuffle(pool);
-      match.meta.livesToKiller = opt.livesToKiller ?? 3;
-      match.meta.startLives = opt.startLives ?? 3;
-      for(let i=0;i<state.order.length;i++){
-        const pid = state.order[i];
-        match.perPlayer[pid] = {
-          target: pool[i % pool.length],
-          lives: match.meta.startLives,
-          killer: (match.meta.startLives >= match.meta.livesToKiller),
-          eliminated: false
-        };
-        match.stats[pid] = initStatsObject();
-      }
-    }
-
-    if(game === "shanghai"){
-      const opt = state.options.shanghai;
-      match.meta.round = opt.startRound ?? 1; // 1..20
-      for(const pid of state.order){
-        match.perPlayer[pid] = { score: 0, shanghaiCount: 0 };
-        match.stats[pid] = initStatsObject();
-      }
-    }
-
-    if(game === "halveit"){
-      const opt = state.options.halveit;
-      match.meta.roundIndex = 0;
-      match.meta.rounds = opt.rounds ?? ["15","16","D","17","18","T","19","20","BULL"];
-      for(const pid of state.order){
-        match.perPlayer[pid] = { score: 0 };
-        match.stats[pid] = initStatsObject();
-      }
-    }
-
-    if(game === "defend"){
-      const opt = state.options.defend;
-      const pool = Array.from({length:20},(_,i)=>i+1);
-      shuffle(pool);
-      match.meta.shieldsToAttack = opt.shieldsToAttack ?? 3;
-      for(let i=0;i<state.order.length;i++){
-        const pid = state.order[i];
-        match.perPlayer[pid] = { target: pool[i % pool.length], shields: 0, attacks: 0 };
-        match.stats[pid] = initStatsObject();
-      }
-    }
-
-    state.match = match;
-    logEvent({ type:"match_start", note:`Startade ${GAMES[game]}` });
-    saveState();
-    renderAll();
-  }
-
-  function initStatsObject(){
-    return { darts:0, points:0, highestTurn:0, checkoutsAttempted:0, checkoutsMade:0 };
-  }
-
-  function shuffle(a){
-    for(let i=a.length-1;i>0;i--){
-      const j = Math.floor(Math.random()*(i+1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-  }
-
-  // ---------------- Tabs ----------------
-  function setTab(tab){
-    state.ui.tab = tab;
-    saveState();
-    renderTabs();
-  }
-  function renderTabs(){
-    const tab = state.ui.tab || "play";
-    const tabs = document.querySelectorAll(".tabs button[data-tab]");
-    tabs.forEach(b => b.classList.toggle("activeTab", b.getAttribute("data-tab") === tab));
-    $("tab_play").style.display = tab === "play" ? "block" : "none";
-    $("tab_stats").style.display = tab === "stats" ? "block" : "none";
-    $("tab_history").style.display = tab === "history" ? "block" : "none";
-  }
-
-  document.querySelectorAll(".tabs button[data-tab]").forEach(btn => {
-    btn.addEventListener("click", () => setTab(btn.getAttribute("data-tab")));
+  $("prevBtn").addEventListener("click", ()=>{
+    if(!state.match) return;
+    snapshot();
+    state.match.turnIndex = (state.match.turnIndex - 1 + state.order.length) % state.order.length;
+    saveState(); renderAll();
+  });
+  $("nextBtn").addEventListener("click", ()=>{
+    if(!state.match) return;
+    snapshot();
+    nextTurn();
+    saveState(); renderAll();
   });
 
-  // ---------------- Play Actions ----------------
-  function nextPlayer(){
-    if(!state.match) return;
-    state.match.currentIndex = (state.match.currentIndex + 1) % state.order.length;
-    saveState(); renderAll();
-  }
+  // Game-specific controls
+  const controls = document.createElement("div");
+  controls.style.marginTop = "12px";
 
-  function prevPlayer(){
-    if(!state.match) return;
-    state.match.currentIndex = (state.match.currentIndex - 1 + state.order.length) % state.order.length;
-    saveState(); renderAll();
-  }
+  if(m.game==="x01"){
+    controls.innerHTML = `
+      <div class="actionGrid">
+        <div class="card" style="padding:12px;">
+          <div class="muted">Turpoäng (0–180)</div>
+          <div class="row" style="margin-top:8px;">
+            <input id="x01Points" inputmode="numeric" placeholder="t.ex. 60" />
+            <button class="primary" id="x01Ok" ${m.ended?"disabled":""}>OK</button>
+          </div>
+          <div class="row" style="margin-top:8px;">
+            <button class="ghost" id="x01Bust" ${m.ended?"disabled":""}>Bust</button>
+            <button class="primary" id="x01Finish" ${m.ended?"disabled":""}>Finish</button>
+          </div>
+          <div class="muted" style="margin-top:8px;">
+            Start ${m.meta.start} • Bust ${m.meta.bust?"På":"Av"} • DO ${m.meta.doubleOut?"På":"Av"}
+          </div>
+        </div>
 
-  function undo(){
-    if(!state.match || state.match.log.length <= 1){
-      alert("Inget att ångra."); return;
-    }
-    // simple undo: revert by rebuilding from scratch using log (except match_start)
-    const snapshot = JSON.parse(JSON.stringify(state));
-    const matchStart = state.match.log.find(e => e.type === "match_start");
-    const logs = state.match.log.filter(e => e.type !== "match_start");
-    logs.pop();
-
-    // restart match with same meta and perPlayer baseline by reinitializing based on current game options used at start
-    // We'll store a "seed" baseline in match.meta._baseline on first render for robustness.
-    if(!state.match.meta._baseline){
-      alert("Kan inte ångra denna match (baseline saknas). Starta om matchen.");
-      state = snapshot;
-      return;
-    }
-    const baseline = JSON.parse(JSON.stringify(state.match.meta._baseline));
-    state.match = baseline;
-    state.match.log = [matchStart];
-
-    for(const e of logs){
-      applyEvent(e, {silent:true});
-    }
-    saveState(); renderAll();
-  }
-
-  function applyEvent(e, {silent=false}={}){
-    const g = state.match.game;
-    if(g === "x01"){
-      if(e.type === "x01_turn"){
-        const pid = e.playerId;
-        const mp = state.match.perPlayer[pid];
-        const before = mp.score;
-        mp.score = e.after;
-        addTurnStats(pid, e.points, e.darts);
-        if(!silent) {}
-      }
-      if(e.type === "x01_finish"){
-        const pid = e.playerId;
-        const mp = state.match.perPlayer[pid];
-        mp.legs += 1;
-        // reset scores for next leg (simple)
-        const start = state.match.meta.start;
-        for(const id of state.order) state.match.perPlayer[id].score = start;
-        const st = initStats(pid);
-        st.checkoutsAttempted += 1;
-        st.checkoutsMade += 1;
-      }
-      if(e.type === "x01_bust"){
-        const pid = e.playerId;
-        const st = initStats(pid);
-        st.darts += e.darts;
-        // points 0
-      }
-      return;
-    }
-
-    if(g === "cricket"){
-      if(e.type === "cricket_hit"){
-        const pid = e.playerId;
-        const target = e.target;
-        const marksAdd = e.marksAdd;
-        const mp = state.match.perPlayer[pid];
-        mp.marks[target] = Math.min(3, mp.marks[target] + marksAdd);
-        // scoring if already closed:
-        if(e.pointsScored && e.pointsScored > 0){
-          if(state.match.meta.cutThroat){
-            // cut-throat: points go to opponents not closed
-            for(const oid of state.order){
-              if(oid === pid) continue;
-              const om = state.match.perPlayer[oid];
-              if(om.marks[target] < 3) om.score += e.pointsScored;
-            }
-          } else {
-            mp.score += e.pointsScored;
-          }
-          addTurnStats(pid, e.pointsScored, e.darts);
-        } else {
-          // still count darts
-          const st = initStats(pid); st.darts += e.darts;
-        }
-      }
-      return;
-    }
-
-    if(g === "around"){
-      if(e.type === "around_hit"){
-        const pid = e.playerId;
-        const mp = state.match.perPlayer[pid];
-        if(mp.done) return;
-        if(e.success){
-          mp.index += 1;
-          if(mp.index >= state.match.meta.seq.length) mp.done = true;
-        }
-        const st = initStats(pid);
-        st.darts += e.darts;
-        // points not meaningful; keep as 0
-      }
-      return;
-    }
-
-    if(g === "killer"){
-      if(e.type === "killer_own"){
-        const pid = e.playerId;
-        const mp = state.match.perPlayer[pid];
-        if(mp.eliminated) return;
-        mp.lives = Math.min(9, mp.lives + e.delta);
-        if(mp.lives >= state.match.meta.livesToKiller) mp.killer = true;
-        const st = initStats(pid); st.darts += e.darts;
-      }
-      if(e.type === "killer_attack"){
-        const by = e.by;
-        const to = e.to;
-        const a = state.match.perPlayer[by];
-        const t = state.match.perPlayer[to];
-        if(a.eliminated || t.eliminated) return;
-        if(!a.killer) return;
-        t.lives = Math.max(0, t.lives - 1);
-        if(t.lives === 0) t.eliminated = true;
-        const st = initStats(by); st.darts += e.darts;
-      }
-      return;
-    }
-
-    if(g === "shanghai"){
-      if(e.type === "shanghai_turn"){
-        const pid = e.playerId;
-        const mp = state.match.perPlayer[pid];
-        mp.score += e.points;
-        if(e.isShanghai) mp.shanghaiCount += 1;
-        addTurnStats(pid, e.points, e.darts);
-        if(e.advanceRound){
-          state.match.meta.round = Math.min(20, state.match.meta.round + 1);
-        }
-      }
-      return;
-    }
-
-    if(g === "halveit"){
-      if(e.type === "halveit_turn"){
-        const pid = e.playerId;
-        const mp = state.match.perPlayer[pid];
-        if(e.zero){
-          mp.score = Math.floor(mp.score / 2);
-        } else {
-          mp.score += e.points;
-        }
-        addTurnStats(pid, e.points, e.darts);
-        if(e.advanceRound){
-          state.match.meta.roundIndex = Math.min(state.match.meta.rounds.length-1, state.match.meta.roundIndex + 1);
-        }
-      }
-      return;
-    }
-
-    if(g === "defend"){
-      if(e.type === "defend_shield"){
-        const pid = e.playerId;
-        const mp = state.match.perPlayer[pid];
-        mp.shields = Math.max(0, Math.min(state.match.meta.shieldsToAttack, mp.shields + e.delta));
-        const st = initStats(pid); st.darts += e.darts;
-      }
-      if(e.type === "defend_attack"){
-        const by = e.by, to = e.to;
-        const a = state.match.perPlayer[by];
-        const t = state.match.perPlayer[to];
-        if(a.shields < state.match.meta.shieldsToAttack) return;
-        t.shields = Math.max(0, t.shields - 1);
-        a.attacks += 1;
-        const st = initStats(by); st.darts += e.darts;
-      }
-      return;
-    }
-  }
-
-  // store baseline meta on first match render
-  function ensureBaseline(){
-    if(!state.match) return;
-    if(state.match.meta._baseline) return;
-    const baseline = JSON.parse(JSON.stringify(state.match));
-    baseline.log = []; // baseline without events
-    state.match.meta._baseline = baseline;
-    saveState();
-  }
-
-  // ---------------- Render: Play Tab ----------------
-  function renderPlay(){
-    const area = $("tab_play");
-    area.innerHTML = "";
-
-    if(!state.match){
-      setTag("Ingen match startad");
-      area.innerHTML = `<div class="notice">Lägg till spelare och tryck <b>Starta / Nollställ match</b>.</div>`;
-      return;
-    }
-    ensureBaseline();
-
-    const g = state.match.game;
-    setTag(`${GAMES[g]} • tur ${ (state.match.currentIndex||0) + 1}/${state.order.length }`);
-
-    const cur = currentPlayerId();
-    const curName = cur ? getPlayerName(cur) : "—";
-
-    const top = document.createElement("div");
-    top.innerHTML = `
-      <div class="kpi">
-        <div class="box"><div class="muted">Nu kastar</div><div class="big">${escapeHtml(curName)}</div></div>
-        <div class="box"><div class="muted">Spel</div><div class="big">${escapeHtml(GAMES[g])}</div></div>
-        <div class="box"><div class="muted">Åtgärder</div>
-          <div class="row" style="margin-top:6px;">
-            <button class="small ghost" id="prevBtn">← Föregående</button>
-            <button class="small primary" id="nextBtn">Nästa →</button>
-            <button class="small ghost" id="undoBtn">Ångra</button>
+        <div class="card" style="padding:12px;">
+          <div class="muted">Snabbvy</div>
+          <div class="tableWrap" style="margin-top:8px;">
+            <table>
+              <thead><tr><th>Spelare</th><th>Kvar</th><th>Legs</th></tr></thead>
+              <tbody>
+                ${state.order.map(id=>{
+                  const p = m.per[id];
+                  const is = id===pid ? " <span class='tag'>NU</span>" : "";
+                  return `<tr>
+                    <td>${escapeHtml(getPlayerName(id))}${is}</td>
+                    <td><b>${p.score}</b></td>
+                    <td>${p.legs}</td>
+                  </tr>`;
+                }).join("")}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-      <div class="hr"></div>
     `;
-    area.appendChild(top);
+    area.appendChild(controls);
 
-    $("prevBtn").addEventListener("click", prevPlayer);
-    $("nextBtn").addEventListener("click", nextPlayer);
-    $("undoBtn").addEventListener("click", undo);
+    $("x01Ok").addEventListener("click", ()=>{
+      const v = clampInt($("x01Points").value,0,180);
+      $("x01Points").value="";
+      x01ApplyTurn(v);
+    });
+    $("x01Points").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("x01Ok").click(); });
 
-    // game-specific UI
-    if(g === "x01") area.appendChild(renderX01UI());
-    if(g === "cricket") area.appendChild(renderCricketUI());
-    if(g === "around") area.appendChild(renderAroundUI());
-    if(g === "killer") area.appendChild(renderKillerUI());
-    if(g === "shanghai") area.appendChild(renderShanghaiUI());
-    if(g === "halveit") area.appendChild(renderHalveItUI());
-    if(g === "defend") area.appendChild(renderDefendUI());
+    $("x01Bust").addEventListener("click", ()=>{
+      // treat as 0 scored but uses a snapshot + next
+      snapshot();
+      const pid2 = currentPlayerId();
+      state.match.log.push({t:Date.now(), type:"x01", msg:`${getPlayerName(pid2)} bust (manuell)`});
+      addStatsTurn(pid2,0,3);
+      nextTurn();
+      saveState(); renderAll();
+    });
+
+    $("x01Finish").addEventListener("click", ()=>{
+      // "finish" means set score 0 then leg++ with reset (simple)
+      snapshot();
+      const pid2 = currentPlayerId();
+      const p = state.match.per[pid2];
+      const before = p.score;
+      p.score = 0;
+      const st = initPlayerStats(state.match, pid2);
+      st.checkoutAttempts += 1;
+      st.checkouts += 1;
+      p.legs += 1;
+      state.match.log.push({t:Date.now(), type:"x01", msg:`${getPlayerName(pid2)} finish (från ${before})`});
+      // reset scores
+      for(const id of state.order) state.match.per[id].score = state.match.meta.start;
+      nextTurn();
+      saveState(); renderAll();
+    });
+    return;
   }
 
-  function renderX01UI(){
-    const wrap = document.createElement("div");
-    const start = state.match.meta.start;
-    const doubleOut = state.match.meta.doubleOut;
-    const bust = state.match.meta.bust;
-
-    const rows = state.order.map(pid => {
-      const mp = state.match.perPlayer[pid];
-      return `<tr>
-        <td>${escapeHtml(getPlayerName(pid))}${pid===currentPlayerId()?` <span class="tag">NU</span>`:""}</td>
-        <td><b>${mp.score}</b></td>
-        <td>${mp.legs}</td>
-        <td class="muted">${avg3dart(pid).toFixed(1)}</td>
-      </tr>`;
-    }).join("");
-
-    wrap.innerHTML = `
-      <div class="notice">
-        X01: Start ${start} • Bust: <b>${bust ? "På" : "Av"}</b> • Double out: <b>${doubleOut ? "På" : "Av"}</b><br/>
-        Registrera <b>turpoäng</b> (summa 3 pilar). Om du trycker “Finish” räknas checkout.
-      </div>
-
+  if(m.game==="cricket"){
+    const targets = m.meta.targets;
+    controls.innerHTML = `
+      <div class="notice">Tryck S/D/T på ett target. Extra marks ger poäng. ${m.meta.cutThroat?"Cut-throat på.":""}</div>
       <div class="hr"></div>
+      <div class="actionGrid">
+        <div class="card" style="padding:12px;">
+          <div class="muted">Targets</div>
+          <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin-top:10px;">
+            ${targets.map(t=>{
+              const myMarks = m.per[pid].marks[t];
+              return `
+                <div class="playerItem" style="margin:0;">
+                  <div style="flex:1 1 120px;">
+                    <div class="playerName">${t}</div>
+                    <div class="playerMeta">Dina marks: ${myMarks}/3</div>
+                  </div>
+                  <div class="row" style="gap:6px;">
+                    <button class="ghost" data-hit="${t}" data-m="1">S</button>
+                    <button class="ghost" data-hit="${t}" data-m="2">D</button>
+                    <button class="ghost" data-hit="${t}" data-m="3">T</button>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
 
-      <div class="row">
-        <input id="x01_points" inputmode="numeric" placeholder="Turpoäng (0-180)" style="width:200px;" />
-        <button class="primary" id="x01_apply">Registrera tur</button>
-        <button class="ghost" id="x01_bust">Bust</button>
-        <button class="primary" id="x01_finish">Finish</button>
+        <div class="card" style="padding:12px;">
+          <div class="muted">Scoreboard</div>
+          <div class="tableWrap" style="margin-top:8px;">
+            <table>
+              <thead><tr><th>Spelare</th><th>Poäng</th><th>Stängt</th></tr></thead>
+              <tbody>
+                ${state.order.map(id=>{
+                  const p = m.per[id];
+                  const closedCount = m.meta.targets.filter(t=>p.marks[t]>=3).length;
+                  const is = id===pid ? " <span class='tag'>NU</span>" : "";
+                  return `<tr>
+                    <td>${escapeHtml(getPlayerName(id))}${is}</td>
+                    <td><b>${p.points}</b></td>
+                    <td>${closedCount}/${m.meta.targets.length}</td>
+                  </tr>`;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-
-      <div class="hr"></div>
-
-      <table class="table">
-        <thead><tr><th>Spelare</th><th>Kvar</th><th>Legs</th><th>3-dart avg</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
     `;
+    area.appendChild(controls);
 
-    wrap.querySelector("#x01_apply").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const mp = state.match.perPlayer[pid];
-      const val = clampInt(wrap.querySelector("#x01_points").value, 0, 180);
-      wrap.querySelector("#x01_points").value = "";
-
-      const before = mp.score;
-      let after = before - val;
-
-      // bust logic
-      if(state.match.meta.bust){
-        if(after < 0) {
-          // bust
-          const e = { type:"x01_bust", playerId: pid, darts:3 };
-          logEvent(e); applyEvent(e);
-          saveState(); renderAll();
-          nextPlayer();
-          return;
-        }
-        if(state.match.meta.doubleOut){
-          // we can't fully verify double-out without dart-by-dart, so enforce only: score cannot reach 1
-          if(after === 1){
-            const e = { type:"x01_bust", playerId: pid, darts:3, note:"double-out: 1 kvar" };
-            logEvent(e); applyEvent(e);
-            saveState(); renderAll();
-            nextPlayer();
-            return;
-          }
-        }
-      }
-
-      after = Math.max(0, after);
-      const e = { type:"x01_turn", playerId: pid, points: val, darts:3, before, after };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-      nextPlayer();
+    area.querySelectorAll("button[data-hit]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const t = btn.getAttribute("data-hit");
+        const mult = Number(btn.getAttribute("data-m"))||1;
+        cricketHit(t,mult);
+      });
     });
-
-    wrap.querySelector("#x01_bust").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const e = { type:"x01_bust", playerId: pid, darts:3 };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-      nextPlayer();
-    });
-
-    wrap.querySelector("#x01_finish").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const st = initStats(pid);
-      st.checkoutsAttempted += 1;
-
-      // If double out on: we cannot verify, so let the user decide if it was valid.
-      // Mark as made.
-      const e = { type:"x01_finish", playerId: pid, darts:3 };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-      nextPlayer();
-    });
-
-    return wrap;
+    return;
   }
 
-  function renderCricketUI(){
-    const wrap = document.createElement("div");
-    const targets = state.match.meta.targets;
-    const cut = state.match.meta.cutThroat;
-
-    const cur = currentPlayerId();
-    const curMp = state.match.perPlayer[cur];
-
-    const header = `
-      <div class="notice">
-        Cricket • ${cut ? "<b>Cut-throat</b>" : "<b>Standard</b>"} • Targets: 20–15 + bull.
-        Registrera hits på target med singel/dubbel/trippel. När target är stängt (3 marks) ger extra marks poäng.
+  if(m.game==="around"){
+    const seq = m.meta.seq;
+    const need = m.per[pid].done ? "KLAR" : (seq[m.per[pid].idx] ?? "—");
+    controls.innerHTML = `
+      <div class="actionGrid">
+        <div class="card" style="padding:12px;">
+          <div class="muted">Mål nu</div>
+          <div style="margin-top:8px; font-size:18px; font-weight:800;">${escapeHtml(need)}</div>
+          <div class="row" style="margin-top:10px;">
+            <button class="primary" id="arHit" ${m.ended?"disabled":""}>Hit</button>
+            <button class="ghost" id="arMiss" ${m.ended?"disabled":""}>Miss</button>
+          </div>
+        </div>
+        <div class="card" style="padding:12px;">
+          <div class="muted">Placering</div>
+          <div class="tableWrap" style="margin-top:8px;">
+            <table>
+              <thead><tr><th>Spelare</th><th>Status</th><th>Plats</th></tr></thead>
+              <tbody>
+                ${state.order.map(id=>{
+                  const p = m.per[id];
+                  const is = id===pid ? " <span class='tag'>NU</span>" : "";
+                  const status = p.done ? "KLAR" : `Nästa: ${m.meta.seq[p.idx] ?? "—"}`;
+                  return `<tr>
+                    <td>${escapeHtml(getPlayerName(id))}${is}</td>
+                    <td>${escapeHtml(status)}</td>
+                    <td>${p.place ?? "—"}</td>
+                  </tr>`;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-      <div class="hr"></div>
     `;
+    area.appendChild(controls);
+    $("arHit").addEventListener("click", ()=> aroundResult(true));
+    $("arMiss").addEventListener("click", ()=> aroundResult(false));
+    return;
+  }
 
-    const buttons = targets.map(t => `
-      <div class="pill" style="justify-content: space-between;">
-        <div>
-          <strong>${t}</strong>
-          <div class="mini muted">Marks (du): ${curMp.marks[t]}/3</div>
-        </div>
-        <div class="row" style="gap:6px;">
-          <button class="small ghost" data-hit="${t}" data-m="1">S</button>
-          <button class="small ghost" data-hit="${t}" data-m="2">D</button>
-          <button class="small ghost" data-hit="${t}" data-m="3">T</button>
-        </div>
-      </div>
-    `).join("");
+  if(m.game==="killer"){
+    const me = m.per[pid];
+    const aliveOthers = state.order.filter(id=>id!==pid && !m.per[id].out);
+    controls.innerHTML = `
+      <div class="actionGrid">
+        <div class="card" style="padding:12px;">
+          <div class="muted">Din status</div>
+          <div style="margin-top:8px;">
+            Nr: <b>${me.num}</b> • Liv: <b>${me.lives}</b> • ${me.killer ? "<span class='tag'>KILLER</span>" : "<span class='tag'>Inte killer</span>"}
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="primary" id="kLife" ${m.ended?"disabled":""}>+1 liv</button>
+            <button class="ghost" id="kMiss" ${m.ended?"disabled":""}>Miss</button>
+          </div>
 
-    const rows = state.order.map(pid => {
-      const mp = state.match.perPlayer[pid];
-      const marksStr = targets.map(t => `${t}:${mp.marks[t]}`).join(" • ");
-      return `<tr>
-        <td>${escapeHtml(getPlayerName(pid))}${pid===cur?` <span class="tag">NU</span>`:""}</td>
-        <td><b>${mp.score}</b></td>
-        <td class="muted">${escapeHtml(marksStr)}</td>
-      </tr>`;
-    }).join("");
-
-    wrap.innerHTML = header + `
-      <div class="twoCol">
-        <div>${buttons}</div>
-        <div>
-          <table class="table">
-            <thead><tr><th>Spelare</th><th>Poäng</th><th>Marks</th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
           <div class="hr"></div>
-          <button class="primary" id="cr_next">Nästa spelare</button>
+
+          <label>Attackera</label>
+          <select id="kVictim" style="margin-top:6px;" ${(!me.killer || m.ended)?"disabled":""}>
+            ${aliveOthers.map(id=>{
+              const v=m.per[id];
+              return `<option value="${id}">${escapeHtml(getPlayerName(id))} (nr ${v.num}, liv ${v.lives})</option>`;
+            }).join("") || `<option value="">Ingen</option>`}
+          </select>
+          <div class="row" style="margin-top:10px;">
+            <button class="primary" id="kAttack" ${(!me.killer || m.ended || aliveOthers.length===0)?"disabled":""}>Attack (-1 liv)</button>
+          </div>
+          <div class="muted" style="margin-top:8px;">Killer vid ${m.meta.livesToKiller} liv.</div>
+        </div>
+
+        <div class="card" style="padding:12px;">
+          <div class="muted">Översikt</div>
+          <div class="tableWrap" style="margin-top:8px;">
+            <table>
+              <thead><tr><th>Spelare</th><th>Nr</th><th>Liv</th><th>Status</th></tr></thead>
+              <tbody>
+                ${state.order.map(id=>{
+                  const p=m.per[id];
+                  const is = id===pid ? " <span class='tag'>NU</span>" : "";
+                  return `<tr>
+                    <td>${escapeHtml(getPlayerName(id))}${is}</td>
+                    <td><b>${p.num}</b></td>
+                    <td><b>${p.lives}</b></td>
+                    <td>${p.out ? "UTE" : (p.killer ? "KILLER" : "")}</td>
+                  </tr>`;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     `;
+    area.appendChild(controls);
 
-    wrap.querySelectorAll("button[data-hit]").forEach(btn => btn.addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const target = btn.getAttribute("data-hit");
-      const mult = Number(btn.getAttribute("data-m")) || 1;
-
-      // compute scoring: marks beyond close, if opponents not closed (standard) / in cut-throat scoring to others
-      const mp = state.match.perPlayer[pid];
-      let pointsScored = 0;
-
-      for(let i=0;i<mult;i++){
-        if(mp.marks[target] < 3){
-          // just add mark
-        } else {
-          // closed already; score if at least one opponent not closed
-          let someoneOpen = false;
-          for(const oid of state.order){
-            if(oid === pid) continue;
-            if(state.match.perPlayer[oid].marks[target] < 3) { someoneOpen = true; break; }
-          }
-          if(someoneOpen){
-            const base = (target === "BULL") ? 25 : Number(target);
-            pointsScored += base;
-          }
-        }
-      }
-
-      const e = { type:"cricket_hit", playerId: pid, target, marksAdd: mult, pointsScored, darts:1 };
-      logEvent(e); applyEvent(e);
+    $("kLife").addEventListener("click", killerGainLife);
+    $("kMiss").addEventListener("click", ()=>{
+      snapshot();
+      state.match.log.push({t:Date.now(), type:"killer", msg:`${getPlayerName(pid)} miss`});
+      addStatsTurn(pid,0,3);
+      nextTurn();
       saveState(); renderAll();
-    }));
-
-    wrap.querySelector("#cr_next").addEventListener("click", nextPlayer);
-    return wrap;
+    });
+    $("kAttack").addEventListener("click", ()=>{
+      const v = $("kVictim").value;
+      if(!v) return;
+      killerAttack(v);
+    });
+    return;
   }
 
-  function renderAroundUI(){
-    const wrap = document.createElement("div");
-    const seq = state.match.meta.seq;
-    const cur = currentPlayerId();
-    const mp = state.match.perPlayer[cur];
-    const need = seq[mp.index] ?? "—";
-
-    const rows = state.order.map(pid => {
-      const p = state.match.perPlayer[pid];
-      const needNow = seq[p.index] ?? "KLAR";
-      return `<tr>
-        <td>${escapeHtml(getPlayerName(pid))}${pid===cur?` <span class="tag">NU</span>`:""}</td>
-        <td>${p.done ? "<b>KLAR</b>" : escapeHtml(needNow)}</td>
-      </tr>`;
-    }).join("");
-
-    wrap.innerHTML = `
-      <div class="notice">
-        Around the Clock: du ska träffa nästa nummer i ordning. Tryck “Hit” om spelaren klarade sitt nummer, annars “Miss”.
-      </div>
-      <div class="hr"></div>
-      <div class="pill" style="justify-content: space-between;">
-        <div>
-          <strong>Nu: ${escapeHtml(getPlayerName(cur))}</strong>
-          <div class="mini muted">Ska träffa: <b>${escapeHtml(need)}</b></div>
+  if(m.game==="shanghai"){
+    controls.innerHTML = `
+      <div class="actionGrid">
+        <div class="card" style="padding:12px;">
+          <div class="muted">Runda</div>
+          <div style="margin-top:8px; font-size:18px; font-weight:800;">${m.meta.round}</div>
+          <div class="row" style="margin-top:10px;">
+            <input id="shPts" inputmode="numeric" placeholder="Poäng (0–180)" />
+            <button class="primary" id="shOk" ${m.ended?"disabled":""}>OK</button>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="ghost" id="shZero" ${m.ended?"disabled":""}>0</button>
+            <button class="primary" id="shMark" ${m.ended?"disabled":""}>Shanghai!</button>
+            <button class="ghost" id="shNextRound">Nästa runda</button>
+          </div>
         </div>
-        <div class="row" style="gap:6px;">
-          <button class="small primary" id="around_hit">Hit</button>
-          <button class="small ghost" id="around_miss">Miss</button>
-          <button class="small primary" id="around_next">Nästa</button>
+
+        <div class="card" style="padding:12px;">
+          <div class="muted">Scoreboard</div>
+          <div class="tableWrap" style="margin-top:8px;">
+            <table>
+              <thead><tr><th>Spelare</th><th>Poäng</th><th>Shanghai</th></tr></thead>
+              <tbody>
+                ${state.order.map(id=>{
+                  const p=m.per[id];
+                  const is = id===pid ? " <span class='tag'>NU</span>" : "";
+                  return `<tr>
+                    <td>${escapeHtml(getPlayerName(id))}${is}</td>
+                    <td><b>${p.points}</b></td>
+                    <td>${p.shanghai}</td>
+                  </tr>`;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-      <div class="hr"></div>
-      <table class="table">
-        <thead><tr><th>Spelare</th><th>Status</th></tr></thead>
-        <tbody>${rows}</tbody>
+    `;
+    area.appendChild(controls);
+
+    $("shOk").addEventListener("click", ()=>{
+      const v = clampInt($("shPts").value,0,180); $("shPts").value="";
+      shanghaiAdd(v,false,false);
+    });
+    $("shPts").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("shOk").click(); });
+    $("shZero").addEventListener("click", ()=> shanghaiAdd(0,false,false));
+    $("shMark").addEventListener("click", ()=> shanghaiAdd(0,true,false));
+    $("shNextRound").addEventListener("click", ()=> shanghaiAdd(0,false,true));
+    return;
+  }
+
+  if(m.game==="halveit"){
+    const target = m.meta.rounds[m.meta.idx] ?? "—";
+    controls.innerHTML = `
+      <div class="actionGrid">
+        <div class="card" style="padding:12px;">
+          <div class="muted">Mål</div>
+          <div style="margin-top:8px; font-size:18px; font-weight:800;">${escapeHtml(target)}</div>
+          <div class="row" style="margin-top:10px;">
+            <input id="hiPts" inputmode="numeric" placeholder="Poäng (0 = halve)" />
+            <button class="primary" id="hiOk" ${m.ended?"disabled":""}>OK</button>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="ghost" id="hiNextTarget">Nästa mål</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding:12px;">
+          <div class="muted">Scoreboard</div>
+          <div class="tableWrap" style="margin-top:8px;">
+            <table>
+              <thead><tr><th>Spelare</th><th>Poäng</th></tr></thead>
+              <tbody>
+                ${state.order.map(id=>{
+                  const p=m.per[id];
+                  const is = id===pid ? " <span class='tag'>NU</span>" : "";
+                  return `<tr>
+                    <td>${escapeHtml(getPlayerName(id))}${is}</td>
+                    <td><b>${p.points}</b></td>
+                  </tr>`;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+    area.appendChild(controls);
+
+    $("hiOk").addEventListener("click", ()=>{
+      const v = clampInt($("hiPts").value,0,180); $("hiPts").value="";
+      halveItTurn(v,false);
+    });
+    $("hiPts").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("hiOk").click(); });
+    $("hiNextTarget").addEventListener("click", ()=> halveItTurn(0,true));
+    return;
+  }
+
+  if(m.game==="defend"){
+    const me = m.per[pid];
+    const need = m.meta.shieldsToAttack;
+    const others = state.order.filter(id=>id!==pid);
+    controls.innerHTML = `
+      <div class="actionGrid">
+        <div class="card" style="padding:12px;">
+          <div class="muted">Din status</div>
+          <div style="margin-top:8px;">
+            Nr: <b>${me.target}</b> • Sköldar: <b>${me.shields}/${need}</b> • Attacker: <b>${me.attacks}</b>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="primary" id="dPlus" ${m.ended?"disabled":""}>+Sköld</button>
+            <button class="ghost" id="dMinus" ${m.ended?"disabled":""}>-Sköld</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <label>Attackera</label>
+          <select id="dVictim" style="margin-top:6px;" ${ (me.shields<need || m.ended) ? "disabled" : "" }>
+            ${others.map(id=>{
+              const v=m.per[id];
+              return `<option value="${id}">${escapeHtml(getPlayerName(id))} (${v.shields} sköld)</option>`;
+            }).join("") || `<option value="">Ingen</option>`}
+          </select>
+          <div class="row" style="margin-top:10px;">
+            <button class="primary" id="dAtk" ${ (me.shields<need || m.ended || others.length===0) ? "disabled" : "" }>Attack</button>
+          </div>
+          <div class="muted" style="margin-top:8px;">Vinst: ${m.meta.winAttacks} attacker.</div>
+        </div>
+
+        <div class="card" style="padding:12px;">
+          <div class="muted">Översikt</div>
+          <div class="tableWrap" style="margin-top:8px;">
+            <table>
+              <thead><tr><th>Spelare</th><th>Nr</th><th>Sköld</th><th>Atk</th></tr></thead>
+              <tbody>
+                ${state.order.map(id=>{
+                  const p=m.per[id];
+                  const is = id===pid ? " <span class='tag'>NU</span>" : "";
+                  return `<tr>
+                    <td>${escapeHtml(getPlayerName(id))}${is}</td>
+                    <td><b>${p.target}</b></td>
+                    <td><b>${p.shields}</b>/${need}</td>
+                    <td>${p.attacks}</td>
+                  </tr>`;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+    area.appendChild(controls);
+
+    $("dPlus").addEventListener("click", ()=> defendShield(+1));
+    $("dMinus").addEventListener("click", ()=> defendShield(-1));
+    $("dAtk").addEventListener("click", ()=>{
+      const v = $("dVictim").value;
+      if(!v) return;
+      defendAttack(v);
+    });
+    return;
+  }
+}
+
+function renderScoreTab(){
+  const area = $("tab_score");
+  area.innerHTML = "";
+  if(!state.match){
+    area.innerHTML = `<div class="notice">Ingen match startad.</div>`;
+    return;
+  }
+  const m = state.match;
+  const pid = currentPlayerId();
+
+  let tableHtml = "";
+
+  if(m.game==="x01"){
+    tableHtml = `
+      <table>
+        <thead><tr><th>Spelare</th><th>Kvar</th><th>Legs</th></tr></thead>
+        <tbody>
+          ${state.order.map(id=>{
+            const p=m.per[id]; const is=id===pid?" <span class='tag'>NU</span>":"";
+            return `<tr><td>${escapeHtml(getPlayerName(id))}${is}</td><td><b>${p.score}</b></td><td>${p.legs}</td></tr>`;
+          }).join("")}
+        </tbody>
       </table>
     `;
-
-    wrap.querySelector("#around_hit").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const e = { type:"around_hit", playerId: pid, success:true, darts:3 };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-    });
-    wrap.querySelector("#around_miss").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const e = { type:"around_hit", playerId: pid, success:false, darts:3 };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-    });
-    wrap.querySelector("#around_next").addEventListener("click", nextPlayer);
-    return wrap;
-  }
-
-  function renderKillerUI(){
-    const wrap = document.createElement("div");
-    const cur = currentPlayerId();
-    const me = state.match.perPlayer[cur];
-    const others = state.order.filter(id => id !== cur);
-
-    const rows = state.order.map(pid => {
-      const mp = state.match.perPlayer[pid];
-      return `<tr>
-        <td>${escapeHtml(getPlayerName(pid))}${pid===cur?` <span class="tag">NU</span>`:""}</td>
-        <td><b>${mp.target}</b></td>
-        <td>${mp.eliminated ? "<span class='tag'>UTE</span>" : `<b>${mp.lives}</b>`}</td>
-        <td>${mp.killer ? "<span class='tag'>KILLER</span>" : ""}</td>
-      </tr>`;
-    }).join("");
-
-    const attackOptions = others.map(pid => {
-      const mp = state.match.perPlayer[pid];
-      const disabled = mp.eliminated ? "disabled" : "";
-      return `<option value="${pid}" ${disabled}>${escapeHtml(getPlayerName(pid))} (nr ${mp.target}, liv ${mp.lives})</option>`;
-    }).join("");
-
-    wrap.innerHTML = `
-      <div class="notice">
-        Killer: du har ett nummer. Träff på eget nummer → +1 liv (max 9). När du har ≥ ${state.match.meta.livesToKiller} liv är du <b>Killer</b>.
-        Killer kan attackera: träff på någon annans nummer → -1 liv (0 = ute).
-      </div>
-      <div class="hr"></div>
-
-      <div class="pill" style="justify-content: space-between;">
-        <div>
-          <strong>${escapeHtml(getPlayerName(cur))}</strong>
-          <div class="mini muted">Ditt nr: <b>${me.target}</b> • Liv: <b>${me.lives}</b> • ${me.killer ? "KILLER" : "ej killer"}</div>
-        </div>
-        <div class="row" style="gap:6px;">
-          <button class="small primary" id="kill_own">+1 liv (träff eget)</button>
-          <button class="small ghost" id="kill_miss">Miss</button>
-          <button class="small primary" id="kill_next">Nästa</button>
-        </div>
-      </div>
-
-      <div class="hr"></div>
-
-      <div class="row">
-        <select id="kill_target" style="min-width:260px;" ${me.killer ? "" : "disabled"}>
-          ${attackOptions || `<option value="">Ingen annan</option>`}
-        </select>
-        <button class="primary" id="kill_attack" ${me.killer ? "" : "disabled"}>Attack (-1 liv)</button>
-      </div>
-
-      <div class="hr"></div>
-      <table class="table">
+  } else if(m.game==="cricket"){
+    const t=m.meta.targets;
+    tableHtml = `
+      <table>
+        <thead><tr><th>Spelare</th><th>Poäng</th><th>Marks</th></tr></thead>
+        <tbody>
+          ${state.order.map(id=>{
+            const p=m.per[id]; const is=id===pid?" <span class='tag'>NU</span>":"";
+            const marks = t.map(x=>`${x}:${p.marks[x]}`).join(" • ");
+            return `<tr><td>${escapeHtml(getPlayerName(id))}${is}</td><td><b>${p.points}</b></td><td class="muted">${escapeHtml(marks)}</td></tr>`;
+          }).join("")}
+        </tbody>
+      </table>
+    `;
+  } else if(m.game==="around"){
+    tableHtml = `
+      <table>
+        <thead><tr><th>Spelare</th><th>Status</th><th>Plats</th></tr></thead>
+        <tbody>
+          ${state.order.map(id=>{
+            const p=m.per[id]; const is=id===pid?" <span class='tag'>NU</span>":"";
+            const status = p.done ? "KLAR" : `Nästa: ${m.meta.seq[p.idx] ?? "—"}`;
+            return `<tr><td>${escapeHtml(getPlayerName(id))}${is}</td><td>${escapeHtml(status)}</td><td>${p.place ?? "—"}</td></tr>`;
+          }).join("")}
+        </tbody>
+      </table>
+    `;
+  } else if(m.game==="killer"){
+    tableHtml = `
+      <table>
         <thead><tr><th>Spelare</th><th>Nr</th><th>Liv</th><th>Status</th></tr></thead>
-        <tbody>${rows}</tbody>
+        <tbody>
+          ${state.order.map(id=>{
+            const p=m.per[id]; const is=id===pid?" <span class='tag'>NU</span>":"";
+            return `<tr><td>${escapeHtml(getPlayerName(id))}${is}</td><td><b>${p.num}</b></td><td><b>${p.lives}</b></td><td>${p.out?"UTE":(p.killer?"KILLER":"")}</td></tr>`;
+          }).join("")}
+        </tbody>
       </table>
     `;
-
-    wrap.querySelector("#kill_own").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const e = { type:"killer_own", playerId: pid, delta:+1, darts:3 };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-    });
-    wrap.querySelector("#kill_miss").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const st = initStats(pid); st.darts += 3;
-      logEvent({ type:"killer_miss", playerId: pid, darts:3 });
-      saveState(); renderAll();
-    });
-    wrap.querySelector("#kill_attack").addEventListener("click", () => {
-      const by = currentPlayerId();
-      const to = wrap.querySelector("#kill_target").value;
-      if(!to){ alert("Välj target."); return; }
-      const e = { type:"killer_attack", by, to, darts:3 };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-    });
-    wrap.querySelector("#kill_next").addEventListener("click", nextPlayer);
-
-    return wrap;
-  }
-
-  function renderShanghaiUI(){
-    const wrap = document.createElement("div");
-    const round = state.match.meta.round;
-    const cur = currentPlayerId();
-
-    const rows = state.order.map(pid => {
-      const mp = state.match.perPlayer[pid];
-      return `<tr>
-        <td>${escapeHtml(getPlayerName(pid))}${pid===cur?` <span class="tag">NU</span>`:""}</td>
-        <td><b>${mp.score}</b></td>
-        <td>${mp.shanghaiCount}</td>
-        <td class="muted">${avg3dart(pid).toFixed(1)}</td>
-      </tr>`;
-    }).join("");
-
-    wrap.innerHTML = `
-      <div class="notice">
-        Shanghai: runda <b>${round}</b>. Registrera poäng på rundans nummer (t.ex. runda 7: singel=7, dubbel=14, trippel=21).
-        Tryck “Shanghai” om spelaren tog S+D+T på samma runda (markeras).
-      </div>
-      <div class="hr"></div>
-      <div class="row">
-        <input id="sh_points" inputmode="numeric" placeholder="Poäng denna runda" style="width:220px;" />
-        <button class="primary" id="sh_apply">Registrera</button>
-        <button class="ghost" id="sh_zero">0 poäng</button>
-        <button class="primary" id="sh_shanghai">Shanghai!</button>
-        <button class="ghost" id="sh_nextRound">Nästa runda →</button>
-      </div>
-      <div class="hr"></div>
-      <table class="table">
-        <thead><tr><th>Spelare</th><th>Poäng</th><th>Shanghai</th><th>3-dart avg</th></tr></thead>
-        <tbody>${rows}</tbody>
+  } else if(m.game==="shanghai"){
+    tableHtml = `
+      <table>
+        <thead><tr><th>Spelare</th><th>Poäng</th><th>Shanghai</th></tr></thead>
+        <tbody>
+          ${state.order.map(id=>{
+            const p=m.per[id]; const is=id===pid?" <span class='tag'>NU</span>":"";
+            return `<tr><td>${escapeHtml(getPlayerName(id))}${is}</td><td><b>${p.points}</b></td><td>${p.shanghai}</td></tr>`;
+          }).join("")}
+        </tbody>
       </table>
     `;
-
-    wrap.querySelector("#sh_apply").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const points = clampInt(wrap.querySelector("#sh_points").value, 0, 180);
-      wrap.querySelector("#sh_points").value = "";
-      const e = { type:"shanghai_turn", playerId: pid, points, darts:3, isShanghai:false, advanceRound:false };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-      nextPlayer();
-    });
-
-    wrap.querySelector("#sh_zero").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const e = { type:"shanghai_turn", playerId: pid, points:0, darts:3, isShanghai:false, advanceRound:false };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-      nextPlayer();
-    });
-
-    wrap.querySelector("#sh_shanghai").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      // Award a configurable bonus? Keep it as 0 points unless user also enters points.
-      const e = { type:"shanghai_turn", playerId: pid, points:0, darts:3, isShanghai:true, advanceRound:false };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-      nextPlayer();
-    });
-
-    wrap.querySelector("#sh_nextRound").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const e = { type:"shanghai_turn", playerId: pid, points:0, darts:0, isShanghai:false, advanceRound:true };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-    });
-
-    return wrap;
-  }
-
-  function renderHalveItUI(){
-    const wrap = document.createElement("div");
-    const rounds = state.match.meta.rounds;
-    const ri = state.match.meta.roundIndex;
-    const round = rounds[ri] ?? "?";
-    const cur = currentPlayerId();
-
-    const rows = state.order.map(pid => {
-      const mp = state.match.perPlayer[pid];
-      return `<tr>
-        <td>${escapeHtml(getPlayerName(pid))}${pid===cur?` <span class="tag">NU</span>`:""}</td>
-        <td><b>${mp.score}</b></td>
-        <td class="muted">${avg3dart(pid).toFixed(1)}</td>
-      </tr>`;
-    }).join("");
-
-    wrap.innerHTML = `
-      <div class="notice">
-        Halve-It: runda <b>${ri+1}/${rounds.length}</b> → mål: <b>${escapeHtml(round)}</b>.
-        Registrera rundpoäng (summa på giltiga träffar). Om 0: halveras spelarens totala poäng.
-      </div>
-      <div class="hr"></div>
-      <div class="row">
-        <input id="hi_points" inputmode="numeric" placeholder="Poäng (0 = halve)" style="width:220px;" />
-        <button class="primary" id="hi_apply">Registrera</button>
-        <button class="ghost" id="hi_nextRound">Nästa runda →</button>
-      </div>
-      <div class="hr"></div>
-      <table class="table">
-        <thead><tr><th>Spelare</th><th>Poäng</th><th>3-dart avg</th></tr></thead>
-        <tbody>${rows}</tbody>
+  } else if(m.game==="halveit"){
+    tableHtml = `
+      <table>
+        <thead><tr><th>Spelare</th><th>Poäng</th></tr></thead>
+        <tbody>
+          ${state.order.map(id=>{
+            const p=m.per[id]; const is=id===pid?" <span class='tag'>NU</span>":"";
+            return `<tr><td>${escapeHtml(getPlayerName(id))}${is}</td><td><b>${p.points}</b></td></tr>`;
+          }).join("")}
+        </tbody>
       </table>
     `;
-
-    wrap.querySelector("#hi_apply").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const points = clampInt(wrap.querySelector("#hi_points").value, 0, 180);
-      wrap.querySelector("#hi_points").value = "";
-      const e = { type:"halveit_turn", playerId: pid, points, zero: points===0, darts:3, advanceRound:false };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-      nextPlayer();
-    });
-
-    wrap.querySelector("#hi_nextRound").addEventListener("click", () => {
-      const e = { type:"halveit_turn", playerId: currentPlayerId(), points:0, zero:false, darts:0, advanceRound:true };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-    });
-
-    return wrap;
-  }
-
-  function renderDefendUI(){
-    const wrap = document.createElement("div");
-    const cur = currentPlayerId();
-    const me = state.match.perPlayer[cur];
-    const need = state.match.meta.shieldsToAttack;
-
-    const rows = state.order.map(pid => {
-      const mp = state.match.perPlayer[pid];
-      return `<tr>
-        <td>${escapeHtml(getPlayerName(pid))}${pid===cur?` <span class="tag">NU</span>`:""}</td>
-        <td><b>${mp.target}</b></td>
-        <td><b>${mp.shields}/${need}</b></td>
-        <td>${mp.attacks}</td>
-      </tr>`;
-    }).join("");
-
-    const others = state.order.filter(id => id !== cur);
-    const attackOptions = others.map(pid => {
-      const mp = state.match.perPlayer[pid];
-      return `<option value="${pid}">${escapeHtml(getPlayerName(pid))} (${mp.shields} sköld)</option>`;
-    }).join("");
-
-    wrap.innerHTML = `
-      <div class="notice">
-        Defend: träff på ditt nummer → +1 sköld (max ${need}). När du har ${need} sköldar kan du attackera: -1 sköld på vald motståndare.
-      </div>
-      <div class="hr"></div>
-      <div class="pill" style="justify-content: space-between;">
-        <div>
-          <strong>${escapeHtml(getPlayerName(cur))}</strong>
-          <div class="mini muted">Ditt nr: <b>${me.target}</b> • Sköldar: <b>${me.shields}/${need}</b></div>
-        </div>
-        <div class="row" style="gap:6px;">
-          <button class="small primary" id="def_plus">+Sköld</button>
-          <button class="small ghost" id="def_minus">-Sköld</button>
-          <button class="small primary" id="def_next">Nästa</button>
-        </div>
-      </div>
-
-      <div class="hr"></div>
-
-      <div class="row">
-        <select id="def_target" style="min-width:260px;" ${me.shields>=need ? "" : "disabled"}>
-          ${attackOptions || `<option value="">Ingen annan</option>`}
-        </select>
-        <button class="primary" id="def_attack" ${me.shields>=need ? "" : "disabled"}>Attack (-1 sköld)</button>
-      </div>
-
-      <div class="hr"></div>
-      <table class="table">
-        <thead><tr><th>Spelare</th><th>Nr</th><th>Sköldar</th><th>Attacker</th></tr></thead>
-        <tbody>${rows}</tbody>
+  } else if(m.game==="defend"){
+    tableHtml = `
+      <table>
+        <thead><tr><th>Spelare</th><th>Nr</th><th>Sköld</th><th>Atk</th></tr></thead>
+        <tbody>
+          ${state.order.map(id=>{
+            const p=m.per[id]; const is=id===pid?" <span class='tag'>NU</span>":"";
+            return `<tr><td>${escapeHtml(getPlayerName(id))}${is}</td><td><b>${p.target}</b></td><td><b>${p.shields}</b>/${m.meta.shieldsToAttack}</td><td>${p.attacks}</td></tr>`;
+          }).join("")}
+        </tbody>
       </table>
     `;
-
-    wrap.querySelector("#def_plus").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const e = { type:"defend_shield", playerId: pid, delta:+1, darts:3 };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-    });
-    wrap.querySelector("#def_minus").addEventListener("click", () => {
-      const pid = currentPlayerId();
-      const e = { type:"defend_shield", playerId: pid, delta:-1, darts:3 };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-    });
-    wrap.querySelector("#def_attack").addEventListener("click", () => {
-      const by = currentPlayerId();
-      const to = wrap.querySelector("#def_target").value;
-      if(!to){ alert("Välj target."); return; }
-      const e = { type:"defend_attack", by, to, darts:3 };
-      logEvent(e); applyEvent(e);
-      saveState(); renderAll();
-    });
-    wrap.querySelector("#def_next").addEventListener("click", nextPlayer);
-
-    return wrap;
   }
 
-  // ---------------- Render: Stats Tab ----------------
-  function renderStats(){
-    const area = $("tab_stats");
-    area.innerHTML = "";
+  area.innerHTML = `
+    <div class="tableWrap">${tableHtml}</div>
+  `;
+}
 
-    if(!state.match){
-      area.innerHTML = `<div class="notice">Ingen match startad.</div>`;
-      return;
-    }
-
-    const rows = state.order.map(pid => {
-      const st = state.match.stats[pid] || initStatsObject();
-      const avg = (st.darts ? (st.points / st.darts) * 3 : 0);
-      const co = (st.checkoutsAttempted ? (st.checkoutsMade / st.checkoutsAttempted) * 100 : 0);
-      return `<tr>
-        <td>${escapeHtml(getPlayerName(pid))}</td>
-        <td>${st.darts}</td>
-        <td>${st.points}</td>
-        <td><b>${avg.toFixed(1)}</b></td>
-        <td>${st.highestTurn}</td>
-        <td>${state.match.game==="x01" ? `${st.checkoutsMade}/${st.checkoutsAttempted} (${co.toFixed(0)}%)` : "—"}</td>
-      </tr>`;
-    }).join("");
-
-    area.innerHTML = `
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Spelare</th><th>Darts</th><th>Poäng</th><th>3-dart avg</th><th>Högsta tur</th><th>Checkout</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
+function renderStatsTab(){
+  const area = $("tab_stats");
+  area.innerHTML = "";
+  if(!state.match){
+    area.innerHTML = `<div class="notice">Ingen match startad.</div>`;
+    return;
+  }
+  const m = state.match;
+  area.innerHTML = `
+    <div class="tableWrap">
+      <table>
+        <thead><tr>
+          <th>Spelare</th><th>Darts</th><th>Poäng</th><th>3-dart avg</th><th>Högsta</th><th>Checkout</th>
+        </tr></thead>
+        <tbody>
+          ${state.order.map(id=>{
+            const st = m.stats[id] || {darts:0,points:0,highestTurn:0,checkoutAttempts:0,checkouts:0};
+            const avg = st.darts ? ((st.points/st.darts)*3).toFixed(1) : "0.0";
+            const co = st.checkoutAttempts ? `${st.checkouts}/${st.checkoutAttempts}` : "—";
+            return `<tr>
+              <td>${escapeHtml(getPlayerName(id))}</td>
+              <td>${st.darts}</td>
+              <td>${st.points}</td>
+              <td><b>${avg}</b></td>
+              <td>${st.highestTurn}</td>
+              <td>${m.game==="x01" ? co : "—"}</td>
+            </tr>`;
+          }).join("")}
+        </tbody>
       </table>
-      <div class="notice">
-        Obs: För spel där “poäng” inte är huvudgrejen (Around/Killer) är poäng/avg mindre relevant, men darts räknas.
-      </div>
-    `;
+    </div>
+    <div class="notice" style="margin-top:12px;">
+      Stats är gemensamma och funkar bäst i X01/Cricket/Shanghai/Halve-It. I Around/Killer/Defend är “poäng” mer neutral men darts loggas.
+    </div>
+  `;
+}
+
+function renderHistoryTab(){
+  const area = $("tab_history");
+  area.innerHTML = "";
+  if(!state.match){
+    area.innerHTML = `<div class="notice">Ingen match startad.</div>`;
+    return;
   }
+  const items = state.match.log.slice(-50).reverse();
+  area.innerHTML = `
+    <div class="row">
+      <button class="ghost" id="copyLogBtn">Kopiera logg</button>
+      <button class="danger" id="clearLogBtn">Rensa logg</button>
+    </div>
+    <div class="hr"></div>
+    <div class="players">
+      ${items.map(e=>{
+        return `<div class="playerItem">
+          <div style="flex:1 1 200px;">
+            <div class="playerName">${escapeHtml(e.type)}</div>
+            <div class="playerMeta">${escapeHtml(new Date(e.t).toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit",second:"2-digit"}))} • ${escapeHtml(e.msg)}</div>
+          </div>
+        </div>`;
+      }).join("") || `<div class="notice">Tom logg.</div>`}
+    </div>
+  `;
 
-  // ---------------- Render: History Tab ----------------
-  function renderHistory(){
-    const area = $("tab_history");
-    area.innerHTML = "";
-
-    if(!state.match){
-      area.innerHTML = `<div class="notice">Ingen match startad.</div>`;
-      return;
-    }
-
-    const items = state.match.log.slice().reverse().map(e => {
-      const t = new Date(e.ts).toLocaleTimeString("sv-SE", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
-      return `<div class="pill" style="align-items:flex-start;">
-        <div style="flex:1;">
-          <strong class="mono">${escapeHtml(e.type)}</strong>
-          <div class="mini muted">${escapeHtml(describeEvent(e))}</div>
-        </div>
-        <div class="mono mini muted">${t}</div>
-      </div>`;
-    }).join("");
-
-    area.innerHTML = `
-      <div class="row">
-        <button class="danger small" id="clearHist">Rensa historik (bara logg)</button>
-      </div>
-      <div class="hr"></div>
-      <div class="players">${items || `<div class="notice">Tom historik.</div>`}</div>
-    `;
-
-    area.querySelector("#clearHist").addEventListener("click", () => {
-      if(confirm("Rensa loggen? (Matchdata kvar)")){
-        // keep match_start and baseline
-        const ms = state.match.log.find(e => e.type==="match_start");
-        state.match.log = ms ? [ms] : [];
-        saveState(); renderAll();
-      }
-    });
-  }
-
-  function describeEvent(e){
-    const g = state.match?.game;
-    if(e.type==="match_start") return e.note || "";
-    if(e.type==="x01_turn") return `${getPlayerName(e.playerId)}: -${e.points} (${e.before}→${e.after})`;
-    if(e.type==="x01_bust") return `${getPlayerName(e.playerId)}: Bust`;
-    if(e.type==="x01_finish") return `${getPlayerName(e.playerId)}: Finish (leg +1)`;
-    if(e.type==="cricket_hit") return `${getPlayerName(e.playerId)}: ${e.target} +${e.marksAdd} marks${e.pointsScored?` (+${e.pointsScored}p)`:""}`;
-    if(e.type==="around_hit") return `${getPlayerName(e.playerId)}: ${e.success ? "Hit" : "Miss"}`;
-    if(e.type==="killer_own") return `${getPlayerName(e.playerId)}: +1 liv`;
-    if(e.type==="killer_attack") return `${getPlayerName(e.by)} attackerade ${getPlayerName(e.to)} (-1 liv)`;
-    if(e.type==="shanghai_turn") return `${getPlayerName(e.playerId)}: ${e.isShanghai ? "Shanghai!" : `+${e.points}p`}${e.advanceRound?" (nästa runda)":""}`;
-    if(e.type==="halveit_turn") return `${getPlayerName(e.playerId)}: ${e.advanceRound?"nästa runda": (e.zero ? "0 → halve" : `+${e.points}p`)}`;
-    if(e.type==="defend_shield") return `${getPlayerName(e.playerId)}: ${e.delta>0?"+":"-"} sköld`;
-    if(e.type==="defend_attack") return `${getPlayerName(e.by)} attackerade ${getPlayerName(e.to)} (-1 sköld)`;
-    return JSON.stringify(e);
-  }
-
-  // ---------------- Render All ----------------
-  function renderAll(){
-    $("gameSelect").value = state.ui.game;
-    $("matchTitle").textContent = state.match ? `Match – ${GAMES[state.match.game]}` : "Match";
-    renderGameOptions();
-    renderPlayers();
-    renderTabs();
-    renderPlay();
-    renderStats();
-    renderHistory();
-  }
-
-  // ---------------- Wire-up UI ----------------
-  $("gameSelect").addEventListener("change", (e) => {
-    state.ui.game = e.target.value;
-    saveState();
-    renderAll();
-  });
-
-  $("addPlayerBtn").addEventListener("click", () => {
-    const name = $("playerName").value.trim();
-    if(!name){ alert("Skriv ett namn."); return; }
-    const id = uid();
-    state.players.push({ id, name });
-    $("playerName").value = "";
-    ensureOrder();
-    saveState();
-    renderAll();
-  });
-
-  $("playerName").addEventListener("keydown", (e) => {
-    if(e.key === "Enter") $("addPlayerBtn").click();
-  });
-
-  $("newMatchBtn").addEventListener("click", startNewMatch);
-
-  $("randomizeOrderBtn").addEventListener("click", () => {
-    ensureOrder();
-    const a = state.order.slice();
-    shuffle(a);
-    state.order = a;
-    saveState(); renderAll();
-  });
-
-  $("resetAllBtn").addEventListener("click", () => {
-    if(confirm("Rensa ALLT? Tar bort spelare, match, allt sparat.")){
-      localStorage.removeItem(STORAGE_KEY);
-      state = {
-        players: [],
-        order: [],
-        ui: { game: "x01", tab: "play" },
-        options: state.options, // keep defaults
-        match: null
-      };
-      saveState();
-      renderAll();
-    }
-  });
-
-  $("exportBtn").addEventListener("click", async () => {
-    const data = JSON.stringify(state, null, 2);
+  $("copyLogBtn").addEventListener("click", async ()=>{
+    const text = JSON.stringify(state.match.log, null, 2);
     try{
-      await navigator.clipboard.writeText(data);
-      alert("Export kopierad till urklipp!");
+      await navigator.clipboard.writeText(text);
+      alert("Loggen kopierad!");
     }catch{
+      alert("Kunde inte kopiera automatiskt. Använd Export istället.");
+    }
+  });
+
+  $("clearLogBtn").addEventListener("click", ()=>{
+    if(confirm("Rensa loggen?")){
+      snapshot();
+      state.match.log = [{t:Date.now(), type:"info", msg:"Logg rensad"}];
+      saveState(); renderAll();
+    }
+  });
+}
+
+/* ==========================
+   Start match dispatcher
+========================== */
+function startMatch(){
+  if(state.players.length===0){ alert("Lägg till minst en spelare."); return; }
+  ensureOrder();
+  if(state.order.length===0){ alert("Turordning saknas."); return; }
+
+  const g = state.ui.game;
+  const m = createEmptyMatch(g);
+
+  if(g==="x01") startX01(m);
+  else if(g==="cricket") startCricket(m);
+  else if(g==="around") startAround(m);
+  else if(g==="killer") startKiller(m);
+  else if(g==="shanghai") startShanghai(m);
+  else if(g==="halveit") startHalveIt(m);
+  else if(g==="defend") startDefend(m);
+
+  state.match = m;
+  saveState();
+  renderAll();
+}
+
+/* ==========================
+   Export / Import / Reset
+========================== */
+function exportState(){
+  const data = JSON.stringify(state, null, 2);
+  // try clipboard, fallback prompt
+  navigator.clipboard?.writeText(data).then(()=>{
+    alert("Export kopierad till urklipp!");
+  }).catch(()=>{
+    // fallback
+    const w = window.open("", "_blank");
+    if(w){
+      w.document.write(`<pre>${escapeHtml(data)}</pre>`);
+      w.document.close();
+    }else{
       prompt("Kopiera JSON:", data);
     }
   });
-
-  $("importBtn").addEventListener("click", () => {
-    $("importArea").style.display = "block";
+}
+function toggleImport(show){
+  $("importBox").style.display = show ? "block" : "none";
+}
+function doImport(){
+  try{
+    const obj = JSON.parse($("importText").value);
+    if(!obj || typeof obj!=="object") throw new Error("Bad");
+    state = obj;
+    // ensure defaults if missing
+    state.options = state.options || JSON.parse(JSON.stringify(DEFAULT_OPTIONS));
+    state.ui = state.ui || {game:"x01", tab:"play"};
+    state.players = state.players || [];
+    state.order = state.order || [];
+    ensureOrder();
+    saveState();
+    toggleImport(false);
     $("importText").value = "";
-  });
-
-  $("cancelImportBtn").addEventListener("click", () => {
-    $("importArea").style.display = "none";
-    $("importText").value = "";
-  });
-
-  $("doImportBtn").addEventListener("click", () => {
-    try{
-      const obj = JSON.parse($("importText").value);
-      // very light validation
-      if(!obj || typeof obj !== "object") throw new Error("Ogiltigt JSON");
-      state = obj;
-      saveState();
-      $("importArea").style.display = "none";
-      renderAll();
-      alert("Import klar!");
-    }catch(e){
-      alert("Import misslyckades: " + (e.message || e));
-    }
-  });
-
-  // initial
-  ensureOrder();
+    renderAll();
+    alert("Import klar!");
+  }catch(e){
+    alert("Import misslyckades: ogiltig JSON.");
+  }
+}
+function resetAll(){
+  if(!confirm("Rensa ALLT? Detta tar bort spelare, match och inställningar.")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = {
+    players: [],
+    order: [],
+    ui: { game:"x01", tab:"play" },
+    options: JSON.parse(JSON.stringify(DEFAULT_OPTIONS)),
+    match: null
+  };
+  saveState();
   renderAll();
+}
+
+/* ==========================
+   Render All
+========================== */
+function renderAll(){
+  // setup select
+  $("gameSelect").value = state.ui.game;
+
+  renderOptions();
+  renderPlayers();
+  renderMatchHeader();
+  renderTabs();
+  renderPlayTab();
+  renderScoreTab();
+  renderStatsTab();
+  renderHistoryTab();
+}
+
+/* ==========================
+   Wire UI
+========================== */
+document.querySelectorAll(".tabs button[data-tab]").forEach(btn=>{
+  btn.addEventListener("click", ()=> setTab(btn.getAttribute("data-tab")));
+});
+
+$("gameSelect").addEventListener("change", (e)=>{
+  state.ui.game = e.target.value;
+  saveState();
+  renderOptions();
+});
+
+$("addPlayerBtn").addEventListener("click", ()=>{
+  const name = $("playerName").value.trim();
+  if(!name) return;
+  const id = uid();
+  state.players.push({id, name});
+  $("playerName").value = "";
+  ensureOrder();
+  saveState();
+  renderAll();
+});
+$("playerName").addEventListener("keydown", (e)=>{ if(e.key==="Enter") $("addPlayerBtn").click(); });
+
+$("shuffleBtn").addEventListener("click", ()=>{
+  ensureOrder();
+  // shuffle order
+  const a = state.order.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  state.order = a;
+  saveState();
+  renderAll();
+});
+
+$("startBtn").addEventListener("click", startMatch);
+
+$("undoBtn").addEventListener("click", undo);
+
+$("exportBtn").addEventListener("click", exportState);
+$("importBtn").addEventListener("click", ()=> toggleImport(true));
+$("cancelImportBtn").addEventListener("click", ()=> toggleImport(false));
+$("doImportBtn").addEventListener("click", doImport);
+$("resetAllBtn").addEventListener("click", resetAll);
+
+// initial
+ensureOrder();
+renderAll();
 </script>
 </body>
 </html>
