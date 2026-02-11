@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>Dart – Simple</title>
+  <style>
+    :root{
+      --bg:#f2f2f7;
+      --card:#ffffff;
+      --hair:rgba(60,60,67,.18);
+      --text:rgba(0,0,0,.92);
+      --muted:rgba(60,60,67,.60);
+      --blue:#0a84ff;
+      --red:#ff3b30;
+      --r:14px;
+      --pad:12px;
+      --gap:10px;
+      --fs:14px;
+    }
+    *{box-sizing:border-box;}
+    html,body{height:100%; max-width:100%; overflow-x:hidden;}
+    body{
+      margin:0;
+      font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:10;
+      padding: calc(8px + env(safe-area-inset-top)) var(--pad) 8px;
+      background: rgba(242,242,247,.88);
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      border-bottom:.5px solid var(--hair);
+    }
+    header .title{font-weight:700; font-size:16px; letter-spacing:-.2px;}
+    header .sub{font-size:12px; color:var(--muted); margin-top:2px;}
+    main{
+      padding: 10px var(--pad) calc(16px + env(safe-area-inset-bottom));
+      max-width: 860px;
+      margin: 0 auto;
+      display:grid;
+      gap: var(--gap);
+    }
+    .card{
+      background:var(--card);
+      border:.5px solid var(--hair);
+      border-radius: var(--r);
+      padding: var(--pad);
+    }
+    .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+    .row > *{min-width:0;}
+    .grow{flex:1 1 auto;}
+    label{font-size:12px; color:var(--muted);}
+    input,select{
+      width:100%;
+      border:.5px solid var(--hair);
+      background:#fff;
+      border-radius: 12px;
+      padding: 10px 11px;
+      font-size: var(--fs);
+      outline:none;
+    }
+    input:focus,select:focus{
+      border-color: rgba(10,132,255,.75);
+      box-shadow: 0 0 0 4px rgba(10,132,255,.16);
+    }
+    button{
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: var(--fs);
+      border:.5px solid var(--hair);
+      background:#fff;
+      color:var(--text);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      cursor:pointer;
+    }
+    button.primary{background:var(--blue); border-color:var(--blue); color:#fff;}
+    button.danger{background:var(--red); border-color:var(--red); color:#fff;}
+    button:disabled{opacity:.5; cursor:not-allowed;}
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:.5px solid var(--hair);
+      color:var(--muted);
+      font-size:12px;
+      background:#fff;
+    }
+    .grid2{display:grid; gap:10px; grid-template-columns:1fr;}
+    @media(min-width: 780px){ .grid2{ grid-template-columns: 1fr 1fr; } }
+    .mini{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .list{display:grid; gap:8px;}
+    .item{
+      border:.5px solid var(--hair);
+      border-radius: 12px;
+      padding: 10px 11px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background:#fff;
+    }
+    .item b{font-weight:700;}
+    .btns{display:flex; gap:6px; flex-wrap:wrap;}
+    table{width:100%; border-collapse:collapse; font-size:13px;}
+    th,td{padding:8px 6px; border-bottom:.5px solid var(--hair); text-align:left; vertical-align:top;}
+    th{color:var(--muted); font-weight:600; font-size:12px;}
+    .log{
+      font-size:12px; color:rgba(0,0,0,.82);
+      display:grid; gap:6px;
+      max-height: 180px;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 2px;
+    }
+    .log .l{
+      border:.5px solid var(--hair);
+      border-radius: 12px;
+      padding: 8px 10px;
+      background:#fff;
+    }
+    .hint{font-size:12px; color:var(--muted); margin-top:6px;}
+  </style>
+</head>
+<body>
+<header>
+  <div class="title">Dart – Simple (mobile first)</div>
+  <div class="sub">Allt på en skärm • 1 fil • sparas lokalt • export/import</div>
+</header>
+
+<main>
+  <!-- TOP: GAME + PLAYERS -->
+  <section class="card">
+    <div class="row" style="justify-content:space-between;">
+      <div class="row" style="gap:10px;">
+        <span class="pill" id="statusPill">Ingen match</span>
+        <span class="pill" id="turnPill">—</span>
+      </div>
+      <div class="row">
+        <button id="exportBtn">Export</button>
+        <button id="importBtn">Import</button>
+        <button class="danger" id="wipeBtn">Rensa</button>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:10px;">
+      <div>
+        <label>Spel</label>
+        <select id="game">
+          <option value="x01">X01 (301/501)</option>
+          <option value="cricket">Cricket</option>
+          <option value="around">Around the Clock</option>
+          <option value="killer">Killer</option>
+          <option value="halveit">Halve-It</option>
+          <option value="defend">Defend</option>
+        </select>
+
+        <div id="opts" class="hint"></div>
+      </div>
+
+      <div>
+        <label>Lägg till spelare</label>
+        <div class="row" style="margin-top:6px;">
+          <input id="name" placeholder="Namn" autocomplete="off" class="grow"/>
+          <button class="primary" id="add">Lägg till</button>
+        </div>
+
+        <div class="hint">Tips: ↑/↓ ändrar turordning.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <label>Spelare & turordning</label>
+      <div id="players" class="list" style="margin-top:6px;"></div>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+      <button class="primary" id="startBtn">Starta / Nollställ</button>
+      <button id="undoBtn" disabled>Ångra</button>
+      <span class="grow"></span>
+      <button id="prevBtn" disabled>←</button>
+      <button id="nextBtn" disabled>Nästa →</button>
+    </div>
+  </section>
+
+  <!-- MIDDLE: INPUT / CONTROLS -->
+  <section class="card">
+    <div class="row" style="justify-content:space-between;">
+      <div style="font-weight:700;">Inmatning</div>
+      <div class="mini" id="roundText">—</div>
+    </div>
+    <div id="controls" style="margin-top:10px;">
+      <div class="hint">Starta en match för att få kontrollpanel.</div>
+    </div>
+  </section>
+
+  <!-- BOTTOM: SCORE + LOG -->
+  <section class="card">
+    <div class="row" style="justify-content:space-between;">
+      <div style="font-weight:700;">Scoreboard</div>
+      <div class="mini" id="metaText">—</div>
+    </div>
+    <div id="score" style="margin-top:8px;" class="hint">Ingen match.</div>
+  </section>
+
+  <section class="card">
+    <div class="row" style="justify-content:space-between;">
+      <div style="font-weight:700;">Logg</div>
+      <button id="clearLogBtn">Töm logg</button>
+    </div>
+    <div id="log" class="log" style="margin-top:8px;"></div>
+  </section>
+
+  <section class="hint" style="text-align:center;">
+    Kör i Safari via GitHub Pages (rekommenderat). All data sparas lokalt i din webbläsare.
+  </section>
+</main>
+
+<script>
+/* ========= Storage ========= */
+const KEY="dart_simple_v1";
+const $=id=>document.getElementById(id);
+
+function load(){ try{ const s=localStorage.getItem(KEY); return s?JSON.parse(s):null; }catch{return null;} }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch{} }
+function uid(){ return Math.random().toString(16).slice(2)+Date.now().toString(16); }
+function now(){ return Date.now(); }
+function tstr(ms){ return new Date(ms).toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit",second:"2-digit"}); }
+function clamp(v,min,max){ v=Number(v); if(!Number.isFinite(v)) v=min; v=Math.round(v); return Math.max(min, Math.min(max, v)); }
+function esc(s){ return String(s).replace(/[&<>"']/g,m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
+
+const DEFAULT_OPTS={
+  x01:{start:501,bust:true},
+  cricket:{cut:false},
+  around:{bull:true},
+  killer:{startLives:3,killerAt:3},
+  halveit:{targets:["20","19","18","17","16","15","BULL","14","13","12","11","10","9","8","7","6","5","4","3","2","1"]},
+  defend:{shieldsToAttack:3,winAttacks:5}
+};
+
+let state = load() ?? {
+  players:[],
+  order:[],
+  game:"x01",
+  opts: JSON.parse(JSON.stringify(DEFAULT_OPTS)),
+  match:null
+};
+
+function ensureOrder(){
+  const ids=state.players.map(p=>p.id);
+  state.order = (state.order||[]).filter(id=>ids.includes(id));
+  for(const id of ids) if(!state.order.includes(id)) state.order.push(id);
+}
+
+function pname(id){ return state.players.find(p=>p.id===id)?.name ?? "Okänd"; }
+function curPid(){ const m=state.match; if(!m || !state.order.length) return null; return state.order[m.turn % state.order.length]; }
+
+function log(msg,type="info"){
+  const m=state.match;
+  const entry={t:now(),type,msg};
+  if(m) m.log.push(entry);
+  else{
+    state._log = state._log || [];
+    state._log.push(entry);
+    if(state._log.length>200) state._log.shift();
+  }
+}
+
+function snapshot(){
+  const m=state.match; if(!m) return;
+  m.undo.push(JSON.parse(JSON.stringify(m)));
+  if(m.undo.length>40) m.undo.shift();
+}
+
+function undo(){
+  const m=state.match; if(!m || !m.undo.length) return;
+  state.match = m.undo.pop();
+  save(); render();
+}
+
+function nextTurn(){ const m=state.match; if(!m) return; m.turn=(m.turn+1)%state.order.length; if(m.turn===0) m.round++; }
+function prevTurn(){ const m=state.match; if(!m) return; m.turn=(m.turn-1+state.order.length)%state.order.length; }
+
+/* ========= Match creation ========= */
+function newMatch(game){
+  return {game, startedAt:now(), round:1, turn:0, ended:false, winner:null, per:{}, log:[], undo:[], meta:{}};
+}
+
+/* ===== Games (simple UI-first) =====
+We track only what’s needed to score & show.
+*/
+
+/* X01 */
+function startX01(m){
+  const opt=state.opts.x01;
+  m.meta={start:opt.start,bust:opt.bust};
+  for(const pid of state.order) m.per[pid]={score:opt.start,legs:0};
+  log(`Start: X01 ${opt.start} (bust ${opt.bust?"på":"av"})`,"start");
+}
+function x01Add(points){
+  const m=state.match, pid=curPid(); if(!m||m.ended||!pid) return;
+  snapshot();
+  const p=m.per[pid];
+  const before=p.score;
+  let after = before - points;
+  if(m.meta.bust && after < 0){
+    log(`${pname(pid)} bust (${points})`,"x01");
+    nextTurn(); save(); render(); return;
+  }
+  if(after < 0) after = 0;
+  p.score = after;
+  log(`${pname(pid)} -${points} (${before}→${after})`,"x01");
+  if(after===0){
+    p.legs++;
+    log(`${pname(pid)} leg! (reset)`,"x01");
+    for(const id of state.order) m.per[id].score = m.meta.start;
+  }
+  nextTurn(); save(); render();
+}
+function x01Finish(){
+  const m=state.match, pid=curPid(); if(!m||m.ended||!pid) return;
+  snapshot();
+  const p=m.per[pid];
+  const before=p.score;
+  p.score=0;
+  p.legs++;
+  log(`${pname(pid)} finish (från ${before})`,"x01");
+  for(const id of state.order) m.per[id].score = m.meta.start;
+  nextTurn(); save(); render();
+}
+
+/* Cricket */
+function startCricket(m){
+  const opt=state.opts.cricket;
+  m.meta={cut:opt.cut, targets:["20","19","18","17","16","15","BULL"]};
+  for(const pid of state.order){
+    m.per[pid]={marks:Object.fromEntries(m.meta.targets.map(t=>[t,0])), points:0};
+  }
+  log(`Start: Cricket${opt.cut?" (cut-throat)":""}`,"start");
+}
+function cricketHit(target,mult){
+  const m=state.match, pid=curPid(); if(!m||m.ended||!pid) return;
+  snapshot();
+  const me=m.per[pid];
+  let pts=0;
+  for(let i=0;i<mult;i++){
+    if(me.marks[target]<3) me.marks[target]++;
+    else{
+      const openSomeone = state.order.some(id=>id!==pid && m.per[id].marks[target]<3);
+      if(openSomeone) pts += (target==="BULL")?25:Number(target);
+    }
+  }
+  if(pts){
+    if(m.meta.cut){
+      for(const id of state.order){
+        if(id===pid) continue;
+        if(m.per[id].marks[target]<3) m.per[id].points += pts;
+      }
+    }else me.points += pts;
+  }
+  log(`${pname(pid)} ${target} x${mult}${pts?` (+${pts})`:""}`,"cricket");
+  save(); render();
+}
+
+/* Around the clock */
+function startAround(m){
+  const opt=state.opts.around;
+  const seq=Array.from({length:20},(_,i)=>String(i+1));
+  if(opt.bull) seq.push("BULL");
+  m.meta={seq};
+  for(const pid of state.order) m.per[pid]={idx:0,done:false,place:null};
+  log(`Start: Around (${opt.bull?"+bull":"utan bull"})`,"start");
+}
+function around(hit){
+  const m=state.match, pid=curPid(); if(!m||m.ended||!pid) return;
+  snapshot();
+  const p=m.per[pid];
+  if(!p.done && hit){
+    p.idx++;
+    if(p.idx>=m.meta.seq.length){
+      p.done=true;
+      const placed = state.order.filter(id=>m.per[id].place!=null).length;
+      p.place=placed+1;
+      log(`${pname(pid)} klar! (plats ${p.place})`,"around");
+      if(state.order.every(id=>m.per[id].done)){
+        m.ended=true;
+        m.winner = state.order.find(id=>m.per[id].place===1) || pid;
+        log(`Vinnare: ${pname(m.winner)}`,"end");
+      }
+    }else log(`${pname(pid)} hit → ${m.meta.seq[p.idx]}`,"around");
+  }else log(`${pname(pid)} miss`,"around");
+  nextTurn(); save(); render();
+}
+
+/* Killer */
+function startKiller(m){
+  const opt=state.opts.killer;
+  // assign numbers 1-20 shuffled
+  const pool=Array.from({length:20},(_,i)=>i+1);
+  for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  m.meta={startLives:opt.startLives,killerAt:opt.killerAt};
+  for(let i=0;i<state.order.length;i++){
+    const pid=state.order[i];
+    m.per[pid]={num:pool[i%20], lives:opt.startLives, killer: opt.startLives>=opt.killerAt, out:false};
+  }
+  log(`Start: Killer (start ${opt.startLives}, killer vid ${opt.killerAt})`,"start");
+}
+function killerLife(){
+  const m=state.match, pid=curPid(); if(!m||m.ended||!pid) return;
+  snapshot();
+  const p=m.per[pid];
+  p.lives=Math.min(9,p.lives+1);
+  if(p.lives>=m.meta.killerAt) p.killer=true;
+  log(`${pname(pid)} +1 liv (${p.lives})`,"killer");
+  nextTurn(); save(); render();
+}
+function killerAttack(victimId){
+  const m=state.match, pid=curPid(); if(!m||m.ended||!pid) return;
+  snapshot();
+  const a=m.per[pid], v=m.per[victimId];
+  if(!a.killer){ log(`${pname(pid)} kan ej attackera (inte Killer)`,"killer"); nextTurn(); save(); render(); return; }
+  v.lives=Math.max(0,v.lives-1);
+  if(v.lives===0) v.out=true;
+  log(`${pname(pid)} attackerar ${pname(victimId)} (-1 liv → ${v.lives})`,"killer");
+  const alive=state.order.filter(id=>!m.per[id].out);
+  if(alive.length===1){ m.ended=true; m.winner=alive[0]; log(`Vinnare: ${pname(m.winner)}`,"end"); }
+  nextTurn(); save(); render();
+}
+
+/* Halve-It */
+function startHalveIt(m){
+  const targets=state.opts.halveit.targets.slice();
+  m.meta={targets, idx:0};
+  for(const pid of state.order) m.per[pid]={points:0};
+  log(`Start: Halve-It (mål ${targets[0]})`,"start");
+}
+function halveIt(points){
+  const m=state.match, pid=curPid(); if(!m||m.ended||!pid) return;
+  snapshot();
+  const p=m.per[pid];
+  if(points===0){
+    p.points = Math.floor(p.points/2);
+    log(`${pname(pid)} 0 → halverad (${p.points})`,"halveit");
+  }else{
+    p.points += points;
+    log(`${pname(pid)} +${points} (${p.points})`,"halveit");
+  }
+  nextTurn(); save(); render();
+}
+function halveNext(){
+  const m=state.match; if(!m) return;
+  snapshot();
+  m.meta.idx = Math.min(m.meta.targets.length-1, m.meta.idx+1);
+  log(`Nytt mål: ${m.meta.targets[m.meta.idx]}`,"halveit");
+  save(); render();
+}
+
+/* Defend */
+function startDefend(m){
+  const opt=state.opts.defend;
+  const pool=Array.from({length:20},(_,i)=>i+1);
+  for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  m.meta={need:opt.shieldsToAttack, win:opt.winAttacks};
+  for(let i=0;i<state.order.length;i++){
+    const pid=state.order[i];
+    m.per[pid]={target:pool[i%20], shields:0, attacks:0};
+  }
+  log(`Start: Defend (attack vid ${opt.shieldsToAttack}, vinst ${opt.winAttacks})`,"start");
+}
+function defendShield(delta){
+  const m=state.match, pid=curPid(); if(!m||m.ended||!pid) return;
+  snapshot();
+  const p=m.per[pid];
+  p.shields = Math.max(0, Math.min(m.meta.need, p.shields + delta));
+  log(`${pname(pid)} ${delta>0?"+":"-"} sköld (${p.shields}/${m.meta.need})`,"defend");
+  nextTurn(); save(); render();
+}
+function defendAttack(victimId){
+  const m=state.match, pid=curPid(); if(!m||m.ended||!pid) return;
+  snapshot();
+  const a=m.per[pid], v=m.per[victimId];
+  if(a.shields < m.meta.need){ log(`${pname(pid)} kan ej attackera (behöver ${m.meta.need})`,"defend"); nextTurn(); save(); render(); return; }
+  v.shields = Math.max(0, v.shields-1);
+  a.attacks++; a.shields=0;
+  log(`${pname(pid)} attackerar ${pname(victimId)} (-1 sköld). Atk ${a.attacks}/${m.meta.win}`,"defend");
+  if(a.attacks>=m.meta.win){ m.ended=true; m.winner=pid; log(`Vinnare: ${pname(pid)}`,"end"); }
+  nextTurn(); save(); render();
+}
+
+/* ========= Start / Reset ========= */
+function start(){
+  ensureOrder();
+  if(state.order.length<1){ alert("Lägg till minst 1 spelare."); return; }
+  const g=state.game;
+  const m=newMatch(g);
+  if(g==="x01") startX01(m);
+  if(g==="cricket") startCricket(m);
+  if(g==="around") startAround(m);
+  if(g==="killer") startKiller(m);
+  if(g==="halveit") startHalveIt(m);
+  if(g==="defend") startDefend(m);
+  state.match=m;
+  save(); render();
+}
+
+/* ========= Render ========= */
+function renderOpts(){
+  const g=state.game, o=state.opts[g];
+  let html="";
+  if(g==="x01"){
+    html = `
+      <div class="row" style="margin-top:6px;">
+        <label class="grow">Start</label>
+        <select id="x01Start" style="max-width:140px;">
+          <option value="501">501</option>
+          <option value="301">301</option>
+        </select>
+        <button id="x01Bust" type="button">${o.bust?"Bust: På":"Bust: Av"}</button>
+      </div>`;
+  }else if(g==="cricket"){
+    html = `<div class="row" style="margin-top:6px;">
+      <button id="crCut" type="button">${o.cut?"Cut-throat: På":"Cut-throat: Av"}</button>
+      <span class="mini">Mål: 20–15 + BULL</span>
+    </div>`;
+  }else if(g==="around"){
+    html = `<div class="row" style="margin-top:6px;">
+      <button id="arBull" type="button">${o.bull?"Bull sist: På":"Bull sist: Av"}</button>
+      <span class="mini">Hit/Miss flyttar till nästa</span>
+    </div>`;
+  }else if(g==="killer"){
+    html = `<div class="row" style="margin-top:6px;">
+      <label>Start-liv</label><input id="kStart" inputmode="numeric" style="max-width:90px" value="${o.startLives}">
+      <label>Killer vid</label><input id="kAt" inputmode="numeric" style="max-width:90px" value="${o.killerAt}">
+    </div>`;
+  }else if(g==="halveit"){
+    html = `<div class="mini" style="margin-top:6px;">0 = halvera. Mål: ${esc(o.targets.join(", "))}</div>`;
+  }else if(g==="defend"){
+    html = `<div class="row" style="margin-top:6px;">
+      <label>Sköldar</label><input id="dNeed" inputmode="numeric" style="max-width:90px" value="${o.shieldsToAttack}">
+      <label>Vinst</label><input id="dWin" inputmode="numeric" style="max-width:90px" value="${o.winAttacks}">
+    </div>`;
+  }
+  $("opts").innerHTML = html;
+
+  // bind option controls
+  if(g==="x01"){
+    $("x01Start").value=String(o.start);
+    $("x01Start").onchange=e=>{ o.start=Number(e.target.value)||501; save(); };
+    $("x01Bust").onclick=()=>{ o.bust=!o.bust; save(); render(); };
+  }
+  if(g==="cricket"){
+    $("crCut").onclick=()=>{ o.cut=!o.cut; save(); render(); };
+  }
+  if(g==="around"){
+    $("arBull").onclick=()=>{ o.bull=!o.bull; save(); render(); };
+  }
+  if(g==="killer"){
+    $("kStart").onchange=e=>{ o.startLives=clamp(e.target.value,2,9); e.target.value=o.startLives; save(); };
+    $("kAt").onchange=e=>{ o.killerAt=clamp(e.target.value,2,9); e.target.value=o.killerAt; save(); };
+  }
+  if(g==="defend"){
+    $("dNeed").onchange=e=>{ o.shieldsToAttack=clamp(e.target.value,2,5); e.target.value=o.shieldsToAttack; save(); };
+    $("dWin").onchange=e=>{ o.winAttacks=clamp(e.target.value,3,10); e.target.value=o.winAttacks; save(); };
+  }
+}
+
+function renderPlayers(){
+  ensureOrder();
+  const el=$("players");
+  if(!state.order.length){
+    el.innerHTML = `<div class="item"><span class="mini">Inga spelare ännu.</span></div>`;
+    return;
+  }
+  el.innerHTML = state.order.map((id,idx)=>`
+    <div class="item">
+      <div class="grow">
+        <b>${esc(pname(id))}</b> <span class="mini">• Tur ${idx+1}</span>
+      </div>
+      <div class="btns">
+        <button data-up="${id}">↑</button>
+        <button data-down="${id}">↓</button>
+        <button class="danger" data-del="${id}">Ta bort</button>
+      </div>
+    </div>
+  `).join("");
+
+  el.querySelectorAll("[data-up]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.up; const i=state.order.indexOf(id);
+    if(i>0){ [state.order[i-1],state.order[i]]=[state.order[i],state.order[i-1]]; save(); render(); }
+  });
+  el.querySelectorAll("[data-down]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.down; const i=state.order.indexOf(id);
+    if(i>=0 && i<state.order.length-1){ [state.order[i+1],state.order[i]]=[state.order[i],state.order[i+1]]; save(); render(); }
+  });
+  el.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.del;
+    state.players=state.players.filter(p=>p.id!==id);
+    state.order=state.order.filter(x=>x!==id);
+    if(state.match){
+      delete state.match.per[id];
+      if(state.match.turn>=state.order.length) state.match.turn=0;
+    }
+    save(); render();
+  });
+}
+
+function renderControls(){
+  const m=state.match;
+  if(!m){
+    $("controls").innerHTML = `<div class="hint">Starta en match för att få kontrollpanel.</div>`;
+    $("roundText").textContent="—";
+    $("prevBtn").disabled=true; $("nextBtn").disabled=true;
+    return;
+  }
+  const pid=curPid(); const who=pid?pname(pid):"—";
+  $("roundText").textContent = m.ended ? `Avslutad • vinnare: ${pname(m.winner)}` : `Runda ${m.round} • Tur: ${who}`;
+  $("prevBtn").disabled=false; $("nextBtn").disabled=false;
+
+  let c="";
+  if(m.game==="x01"){
+    c = `
+      <div class="row">
+        <input id="pts" inputmode="numeric" placeholder="Poäng (0–180)" class="grow">
+        <button class="primary" id="ok">OK</button>
+        <button id="fin">Finish</button>
+      </div>
+      <div class="hint">OK = dra poäng. Finish = direkt 0 + leg + reset.</div>
+    `;
+  } else if(m.game==="cricket"){
+    const t=m.meta.targets;
+    c = `
+      <div class="mini">Tryck S/D/T på målet. (Poäng räknas automatiskt när du har stängt.)</div>
+      <div class="list" style="margin-top:8px;">
+        ${t.map(x=>`
+          <div class="item">
+            <div class="grow"><b>${x}</b> <span class="mini">• dina marks: ${m.per[pid].marks[x]}/3</span></div>
+            <div class="btns">
+              <button data-hit="${x}" data-m="1">S</button>
+              <button data-hit="${x}" data-m="2">D</button>
+              <button data-hit="${x}" data-m="3">T</button>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  } else if(m.game==="around"){
+    const need = m.per[pid].done ? "KLAR" : (m.meta.seq[m.per[pid].idx] ?? "—");
+    c = `
+      <div class="row" style="justify-content:space-between;">
+        <div><b>Mål:</b> ${esc(need)}</div>
+        <div class="btns">
+          <button class="primary" id="hit">Hit</button>
+          <button id="miss">Miss</button>
+        </div>
+      </div>
+    `;
+  } else if(m.game==="killer"){
+    const me=m.per[pid];
+    const victims=state.order.filter(id=>id!==pid && !m.per[id].out);
+    c = `
+      <div class="mini">Ditt nr: <b>${me.num}</b> • Liv: <b>${me.lives}</b> ${me.killer?"• KILLER":""}</div>
+      <div class="row" style="margin-top:8px;">
+        <button class="primary" id="life">+1 liv</button>
+        <span class="grow"></span>
+        <select id="vict" class="grow" ${(!me.killer||!victims.length)?"disabled":""}>
+          ${victims.map(id=>`<option value="${id}">${esc(pname(id))} (nr ${m.per[id].num}, liv ${m.per[id].lives})</option>`).join("") || `<option value="">Ingen</option>`}
+        </select>
+        <button id="atk" class="primary" ${(!me.killer||!victims.length)?"disabled":""}>Attack</button>
+      </div>
+    `;
+  } else if(m.game==="halveit"){
+    const target=m.meta.targets[m.meta.idx] ?? "—";
+    c = `
+      <div class="row">
+        <div class="grow"><b>Mål:</b> ${esc(target)} <span class="mini">• 0 = halvera</span></div>
+        <button id="nextTarget">Nästa mål</button>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <input id="pts" inputmode="numeric" placeholder="Poäng (0…)" class="grow">
+        <button class="primary" id="ok">OK</button>
+      </div>
+    `;
+  } else if(m.game==="defend"){
+    const me=m.per[pid];
+    const others=state.order.filter(id=>id!==pid);
+    c = `
+      <div class="mini">Ditt nr: <b>${me.target}</b> • Sköld: <b>${me.shields}/${m.meta.need}</b> • Atk: <b>${me.attacks}/${m.meta.win}</b></div>
+      <div class="row" style="margin-top:8px;">
+        <button class="primary" id="plus">+Sköld</button>
+        <button id="minus">-Sköld</button>
+        <span class="grow"></span>
+        <select id="vict" class="grow" ${(me.shields<m.meta.need||!others.length)?"disabled":""}>
+          ${others.map(id=>`<option value="${id}">${esc(pname(id))} (${m.per[id].shields} sköld)</option>`).join("") || `<option value="">Ingen</option>`}
+        </select>
+        <button id="atk" class="primary" ${(me.shields<m.meta.need||!others.length)?"disabled":""}>Attack</button>
+      </div>
+    `;
+  }
+
+  $("controls").innerHTML = c;
+
+  // Bind per-game controls
+  if(m.game==="x01"){
+    $("ok").onclick=()=>{ const v=clamp($("pts").value,0,180); $("pts").value=""; x01Add(v); };
+    $("fin").onclick=x01Finish;
+    $("pts").onkeydown=(e)=>{ if(e.key==="Enter"){ e.preventDefault(); $("ok").click(); } };
+  }
+  if(m.game==="cricket"){
+    $("controls").querySelectorAll("[data-hit]").forEach(b=>{
+      b.onclick=()=>cricketHit(b.dataset.hit, Number(b.dataset.m)||1);
+    });
+  }
+  if(m.game==="around"){
+    $("hit").onclick=()=>around(true);
+    $("miss").onclick=()=>around(false);
+  }
+  if(m.game==="killer"){
+    $("life").onclick=killerLife;
+    const btn=$("atk"); if(btn) btn.onclick=()=>{ const v=$("vict").value; if(v) killerAttack(v); };
+  }
+  if(m.game==="halveit"){
+    $("ok").onclick=()=>{ const v=clamp($("pts").value,0,180); $("pts").value=""; halveIt(v); };
+    $("nextTarget").onclick=halveNext;
+    $("pts").onkeydown=(e)=>{ if(e.key==="Enter"){ e.preventDefault(); $("ok").click(); } };
+  }
+  if(m.game==="defend"){
+    $("plus").onclick=()=>defendShield(+1);
+    $("minus").onclick=()=>defendShield(-1);
+    $("atk").onclick=()=>{ const v=$("vict").value; if(v) defendAttack(v); };
+  }
+}
+
+function renderScore(){
+  const m=state.match;
+  if(!m){ $("score").textContent="Ingen match."; $("metaText").textContent="—"; return; }
+  const pid=curPid();
+  $("metaText").textContent = m.game.toUpperCase();
+  let html="<table><thead><tr><th>Spelare</th><th>Info</th></tr></thead><tbody>";
+
+  if(m.game==="x01"){
+    html = "<table><thead><tr><th>Spelare</th><th>Kvar</th><th>Legs</th></tr></thead><tbody>" +
+      state.order.map(id=>{
+        const p=m.per[id];
+        return `<tr><td><b>${esc(pname(id))}</b>${id===pid?' <span class="pill">NU</span>':''}</td><td>${p.score}</td><td>${p.legs}</td></tr>`;
+      }).join("") + "</tbody></table>";
+  }
+  else if(m.game==="cricket"){
+    html = "<table><thead><tr><th>Spelare</th><th>Poäng</th><th>Stängt</th></tr></thead><tbody>" +
+      state.order.map(id=>{
+        const p=m.per[id];
+        const closed=m.meta.targets.filter(t=>p.marks[t]>=3).length;
+        return `<tr><td><b>${esc(pname(id))}</b>${id===pid?' <span class="pill">NU</span>':''}</td><td>${p.points}</td><td>${closed}/${m.meta.targets.length}</td></tr>`;
+      }).join("") + "</tbody></table>";
+  }
+  else if(m.game==="around"){
+    html = "<table><thead><tr><th>Spelare</th><th>Nästa</th><th>Plats</th></tr></thead><tbody>" +
+      state.order.map(id=>{
+        const p=m.per[id];
+        const next=p.done?"KLAR":(m.meta.seq[p.idx] ?? "—");
+        return `<tr><td><b>${esc(pname(id))}</b>${id===pid?' <span class="pill">NU</span>':''}</td><td>${esc(next)}</td><td>${p.place ?? "—"}</td></tr>`;
+      }).join("") + "</tbody></table>";
+  }
+  else if(m.game==="killer"){
+    html = "<table><thead><tr><th>Spelare</th><th>Nr</th><th>Liv</th><th>Status</th></tr></thead><tbody>" +
+      state.order.map(id=>{
+        const p=m.per[id];
+        return `<tr><td><b>${esc(pname(id))}</b>${id===pid?' <span class="pill">NU</span>':''}</td><td>${p.num}</td><td>${p.lives}</td><td>${p.out?"UTE":(p.killer?"KILLER":"")}</td></tr>`;
+      }).join("") + "</tbody></table>";
+  }
+  else if(m.game==="halveit"){
+    const target=m.meta.targets[m.meta.idx] ?? "—";
+    $("metaText").textContent = `HALVE-IT • mål ${target}`;
+    html = "<table><thead><tr><th>Spelare</th><th>Poäng</th></tr></thead><tbody>" +
+      state.order.map(id=>{
+        const p=m.per[id];
+        return `<tr><td><b>${esc(pname(id))}</b>${id===pid?' <span class="pill">NU</span>':''}</td><td>${p.points}</td></tr>`;
+      }).join("") + "</tbody></table>";
+  }
+  else if(m.game==="defend"){
+    html = "<table><thead><tr><th>Spelare</th><th>Nr</th><th>Sköld</th><th>Atk</th></tr></thead><tbody>" +
+      state.order.map(id=>{
+        const p=m.per[id];
+        return `<tr><td><b>${esc(pname(id))}</b>${id===pid?' <span class="pill">NU</span>':''}</td><td>${p.target}</td><td>${p.shields}/${m.meta.need}</td><td>${p.attacks}</td></tr>`;
+      }).join("") + "</tbody></table>";
+  }
+
+  $("score").innerHTML = html;
+}
+
+function renderLog(){
+  const m=state.match;
+  const arr = m ? m.log : (state._log||[]);
+  const last = arr.slice(-60).reverse();
+  $("log").innerHTML = last.map(e=>`<div class="l"><span class="mini">${tstr(e.t)} • ${esc(e.type)}</span><div>${esc(e.msg)}</div></div>`).join("")
+    || `<div class="l"><span class="mini">Tomt</span></div>`;
+}
+
+function renderStatus(){
+  const m=state.match;
+  if(!m){
+    $("statusPill").textContent="Ingen match";
+    $("turnPill").textContent="—";
+    $("undoBtn").disabled=true;
+    return;
+  }
+  $("statusPill").textContent = m.ended ? "Avslutad" : "Match igång";
+  const pid=curPid();
+  $("turnPill").textContent = m.ended ? `Vinnare: ${pname(m.winner)}` : `Tur: ${pid ? pname(pid) : "—"}`;
+  $("undoBtn").disabled = !m.undo.length;
+}
+
+function render(){
+  ensureOrder();
+  $("game").value=state.game;
+  renderOpts();
+  renderPlayers();
+  renderControls();
+  renderScore();
+  renderLog();
+  renderStatus();
+  save();
+}
+
+/* ========= Export / Import ========= */
+function doExport(){
+  const data = JSON.stringify(state, null, 2);
+  navigator.clipboard?.writeText(data)
+    .then(()=>alert("Export kopierad till urklipp!"))
+    .catch(()=>prompt("Kopiera JSON:", data));
+}
+function doImport(){
+  const txt = prompt("Klistra in JSON-export:");
+  if(!txt) return;
+  try{
+    const obj=JSON.parse(txt);
+    state=obj;
+    state.opts = state.opts || JSON.parse(JSON.stringify(DEFAULT_OPTS));
+    state.players = state.players || [];
+    state.order = state.order || [];
+    ensureOrder();
+    save(); render();
+    alert("Import klar!");
+  }catch(e){
+    alert("Ogiltig JSON.");
+  }
+}
+function wipe(){
+  if(!confirm("Rensa ALLT (spelare, match, logg)?")) return;
+  try{ localStorage.removeItem(KEY); }catch{}
+  state={players:[],order:[],game:"x01",opts:JSON.parse(JSON.stringify(DEFAULT_OPTS)),match:null};
+  save(); render();
+}
+
+/* ========= Wiring ========= */
+function wire(){
+  $("game").onchange = e=>{ state.game=e.target.value; save(); render(); };
+
+  const addPlayer = (e)=>{
+    e?.preventDefault?.(); e?.stopPropagation?.();
+    const n=$("name").value.trim();
+    if(!n) return;
+    state.players.push({id:uid(), name:n});
+    $("name").value="";
+    ensureOrder(); save(); render();
+  };
+  // bind multiple events (iOS-safe)
+  $("add").addEventListener("click", addPlayer);
+  $("add").addEventListener("pointerup", addPlayer);
+  $("add").addEventListener("touchend", addPlayer, {passive:false});
+  $("name").addEventListener("keydown",(e)=>{ if(e.key==="Enter"){ e.preventDefault(); addPlayer(e); } });
+
+  $("startBtn").onclick=start;
+  $("undoBtn").onclick=undo;
+  $("prevBtn").onclick=()=>{ if(!state.match) return; snapshot(); prevTurn(); save(); render(); };
+  $("nextBtn").onclick=()=>{ if(!state.match) return; snapshot(); nextTurn(); save(); render(); };
+
+  $("exportBtn").onclick=doExport;
+  $("importBtn").onclick=doImport;
+  $("wipeBtn").onclick=wipe;
+  $("clearLogBtn").onclick=()=>{ if(state.match) state.match.log=[]; else state._log=[]; save(); render(); };
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  wire();
+  render();
+});
+</script>
+</body>
+</html>
